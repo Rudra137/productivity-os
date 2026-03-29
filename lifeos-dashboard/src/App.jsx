@@ -10,6 +10,11 @@ function App() {
     setTaskList([...taskList, task]);
     setTask("");
   };
+  const handleDelete = (indextoDelete) => {
+    const updatedList = taskList.filter((_, i) => i !== indextoDelete);
+    setTaskList(updatedList);
+  }
+
 
   return (
     <div style={{ padding: "20px" }}>
@@ -26,9 +31,12 @@ function App() {
       </div>
 
       <ul>
-        {taskList.map((t, index) => (
-          <li key={index}>{t}</li>
-        ))}
+          {taskList.map((t, index) => (
+            <li key={index}>
+              {t}
+              <button onClick={() => handleDelete(index)}>Delete</button>
+            </li>
+         ))}
       </ul>
     </div>
   );
