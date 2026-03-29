@@ -3,6 +3,8 @@ import { useState } from "react";
 function App() {
   const [task, setTask] = useState("");
   const [taskList, setTaskList] = useState([]);
+  const [editIndex, setEditIndex] = useState(null);
+  const [editText, setEditText] = useState("");
 
   const handleAddTask = () => {
     if (task.trim() === "") return;
@@ -14,7 +16,15 @@ function App() {
     const updatedList = taskList.filter((_, i) => i !== indextoDelete);
     setTaskList(updatedList);
   }
+  const handleEdit = (indexToEdit, newText) => {
+  if (newText.trim() === "") return;
 
+  setTaskList((prevList) =>
+    prevList.map((t, i) =>
+      i === indexToEdit ? newText : t
+    )
+  );
+};
 
   return (
     <div style={{ padding: "20px" }}>
@@ -35,10 +45,27 @@ function App() {
             <li key={index}>
               {t}
               <button onClick={() => handleDelete(index)}>Delete</button>
+              <button onClick={() => {setEditIndex(index); setEditText(t);}}>Edit</button>
+              <button onClick={() => setEditIndex(null)}>Cancel</button>
+              {editIndex === index && (
+                <div>
+                  <input
+                    type="text"
+                    value={editText}
+                    onChange={(e) => setEditText(e.target.value)}
+                  />
+                  <button onClick={() => {
+                    handleEdit(index, editText);
+                    setEditIndex(null);
+                  }}>Save</button>
+                </div>
+              )}
             </li>
          ))}
       </ul>
     </div>
+    
+
   );
 }
 
