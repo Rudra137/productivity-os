@@ -42,26 +42,33 @@ function App() {
 
       <ul>
           {taskList.map((t, index) => (
-            <li key={index}>
-              {t}
-              <button onClick={() => handleDelete(index)}>Delete</button>
-              <button onClick={() => {setEditIndex(index); setEditText(t);}}>Edit</button>
-              <button onClick={() => setEditIndex(null)}>Cancel</button>
-              {editIndex === index && (
-                <div>
-                  <input
-                    type="text"
-                    value={editText}
-                    onChange={(e) => setEditText(e.target.value)}
-                  />
-                  <button onClick={() => {
-                    handleEdit(index, editText);
-                    setEditIndex(null);
-                  }}>Save</button>
-                </div>
-              )}
-            </li>
-         ))}
+          <li key={index}>
+  {editIndex === index ? (
+    // EDIT MODE
+    <div>
+      <input
+        type="text"
+        value={editText}
+        onChange={(e) => setEditText(e.target.value)}
+      />
+      <button onClick={() => {handleEdit(index, editText); setEditIndex(null); setEditText("");}}>Save</button>
+      <button onClick={() => setEditIndex(null)}>Cancel</button>
+    </div>
+  ) : (
+    // VIEW MODE
+    <div>
+      <span>{t}</span>
+      <button onClick={() => handleDelete(index)}>Delete</button>
+      <button onClick={() => {
+        setEditIndex(index);
+        setEditText(t);
+      }}>
+        Edit
+      </button>
+    </div>
+          )}
+        </li>
+       ))}
       </ul>
     </div>
     
