@@ -56,27 +56,66 @@ function App() {
   });
 };
 
+  const totalTasks = tasks.length;
+  const completedTasks = tasks.filter(t => t.completed).length;
+  const pendingTasks = totalTasks - completedTasks;
 
 
   // Render the dashboard UI
   return (
-    <div style={{ padding: "20px" }}>
+    // Main container with padding
+    
+
+  <div style={{ padding: "20px", backgroundColor: "beige", minHeight: "100vh" }}>
       <h1>LifeOS Dashboard</h1>
 
-      <div>
-        <input
-          type="text"
-          placeholder="Enter task..."
-          value={task}
-          onChange={(e) => setTask(e.target.value)}
-        />
-        <button onClick={addTask}>Add Task</button>
-      </div>
+      {/* 🟦 STATS SECTION */<div style={{
+      marginBottom: "20px",
+      padding: "10px",
+      border: "1px solid #aaa",
+      borderRadius: "10px"
+        }}>
+      <h3>📊 Daily Stats</h3>
+      <p>Total: {totalTasks}</p>
+      <p>Completed: {completedTasks}</p>
+      <p>Pending: {pendingTasks}</p>
+    </div>}
+
+   {/*  INPUT SECTION */}
+  <div style={{
+    marginBottom: "20px",
+    padding: "15px",
+    border: "1px solid #ccc",
+    borderRadius: "10px"
+  }}>
+    <h3>Add Task</h3>
+    
+    <input
+      type="text"
+      placeholder="Enter task..."
+      value={task}
+      onChange={(e) => setTask(e.target.value)}
+    />
+    
+    <button onClick={addTask}>Add Task</button>
+  </div>
+
+  {/* 🟩 TASK LIST SECTION */}
+  <div style={{
+    padding: "15px",
+    border: "1px solid #ccc",
+    borderRadius: "10px",
+    
+  }}>
+    <h3>Your Tasks</h3>
+
 
       <ul>
           {tasks.map((task, index) => (
           <li key={index}>
   {editIndex === index ? (
+    
+
     // EDIT MODE
     <div>
       <input
@@ -117,9 +156,10 @@ function App() {
        ))}
       </ul>
     </div>
-    
+  </div>  
 
   );
 }
+
 
 export default App;
