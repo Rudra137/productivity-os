@@ -60,16 +60,29 @@ function App() {
   const completedTasks = tasks.filter(t => t.completed).length;
   const pendingTasks = totalTasks - completedTasks;
 
+  const btnStyle = {
+  marginLeft: "5px",
+  padding: "6px 10px",
+  borderRadius: "6px",
+  border: "none",
+  cursor: "pointer",
+  background: "#ddd"
+  }
 
   // Render the dashboard UI
   return (
     // Main container with padding
     
 
-  <div style={{ padding: "20px", backgroundColor: "beige", minHeight: "100vh" }}>
-      <h1>LifeOS Dashboard</h1>
+  <div style={{  padding: "30px",
+      maxWidth: "600px",
+      margin: "auto",
+      fontFamily: "sans-serif" }}>
+          <h1>LifeOS Dashboard</h1>
 
-      {/* 🟦 STATS SECTION */<div style={{
+
+      {/* 🟦 STATS SECTION */}
+      <div style={{
       marginBottom: "20px",
       padding: "10px",
       border: "1px solid #aaa",
@@ -79,7 +92,7 @@ function App() {
       <p>Total: {totalTasks}</p>
       <p>Completed: {completedTasks}</p>
       <p>Pending: {pendingTasks}</p>
-    </div>}
+    </div>
 
    {/*  INPUT SECTION */}
   <div style={{
@@ -88,16 +101,30 @@ function App() {
     border: "1px solid #ccc",
     borderRadius: "10px"
   }}>
-    <h3>Add Task</h3>
+    <h3 style={{ marginBottom: "10px" }}>Add Task</h3>
     
     <input
       type="text"
       placeholder="Enter task..."
       value={task}
       onChange={(e) => setTask(e.target.value)}
+          style={{
+      padding: "10px",
+      width: "70%",
+      marginRight: "10px",
+      borderRadius: "8px",
+      border: "1px solid #c5a6a6"
+    }}
     />
     
-    <button onClick={addTask}>Add Task</button>
+    <button onClick={addTask} style={{
+    padding: "10px 15px",
+    borderRadius: "8px",
+    border: "none",
+    background: "#4CAF50",
+    color: "white",
+    cursor: "pointer"
+  }}>Add Task</button>
   </div>
 
   {/* 🟩 TASK LIST SECTION */}
@@ -107,12 +134,21 @@ function App() {
     borderRadius: "10px",
     
   }}>
-    <h3>Your Tasks</h3>
+    <h3 style={{ marginBottom: "10px" }}>Your Tasks</h3>
 
 
-      <ul>
+      <ul style={{ listStyle: "none", padding: 0 }}>
           {tasks.map((task, index) => (
-          <li key={index}>
+          <li key={index} style={{
+  marginBottom: "10px",
+  padding: "12px",
+  borderRadius: "10px",
+  background: "white",
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  boxShadow: "0 2px 5px rgba(0,0,0,0.1)"
+}}>
   {editIndex === index ? (
     
 
@@ -123,31 +159,32 @@ function App() {
         value={editText}
         onChange={(e) => setEditText(e.target.value)}
       />
-      <button onClick={() => {handleEdit(index, editText); setEditIndex(null); setEditText("")}}>Save</button>
-      <button onClick={() => setEditIndex(null)}>Cancel</button>
+      <button onClick={() => {handleEdit(index, editText); setEditIndex(null); setEditText("")}} style={btnStyle}>Save</button>
+      <button onClick={() => setEditIndex(null)} style={btnStyle}>Cancel</button>
     </div>
   ) : (
     // VIEW MODE
     <div>
   <span
     style={{
-      textDecoration: task.completed ? "line-through" : "none",
-      opacity: task.completed ? 0.5 : 1
-    }}
+  textDecoration: task.completed ? "line-through" : "none",
+  color: task.completed ? "gray" : "black",
+  fontWeight: task.completed ? "normal" : "500"
+}}
   >
     {task.text}
   </span>
 
-  <button onClick={() => handleDelete(index)}>Delete</button>
+  <button onClick={() => handleDelete(index)} style={btnStyle}>Delete</button>
 
   <button onClick={() => {
     setEditIndex(index);
     setEditText(task.text);
-  }}>
+  }} style={btnStyle}>
     Edit
   </button>
 
-  <button onClick={() => toggleComplete(task.id)}>
+  <button onClick={() => toggleComplete(task.id)} style={btnStyle}>
     {task.completed ? "Undo" : "Done"}
   </button>
 </div>
