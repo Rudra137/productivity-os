@@ -1,14 +1,30 @@
 import { useState } from "react";
+import { useEffect } from "react";
+
 
 function App() {
   const [task, setTask] = useState("");
   const [editIndex, setEditIndex] = useState(null);
   const [editText, setEditText] = useState("");
   const [tasks, setTasks] = useState([]);
+  const [category, setCategory] = useState("General");
+  const [priority, setPriority] = useState("Medium");
+  const [filter, setFilter] = useState("All");
   
 
 
   // Functions for handling task input and list management
+  useEffect(() => {
+  const savedTasks = localStorage.getItem("tasks");
+  if (savedTasks) {
+    setTasks(JSON.parse(savedTasks));
+  }
+}, []);
+
+useEffect(() => {
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+}, [tasks]);
+
 
   //function to handle adding a new task to the list
   const addTask = () => {
@@ -19,11 +35,14 @@ function App() {
     {
       id: Date.now(),
       text: task,
-      completed: false
+      completed: false,
+      category: category,
+      priority: priority,
+      date: new Date().toLocaleDateString()
     }
   ]);
 
-  setTask(""); // clear input
+  setTask("");
 };
 
 
@@ -55,11 +74,23 @@ function App() {
     return updated;
   });
 };
+  
+  const today = new Date().toLocaleDateString();
+  const todaysTasks = tasks.filter(
+  (task) => task.date === today
+);
+const filteredTasks = todaysTasks.filter((task) => {
+  if (filter === "Completed") return task.completed;
+  if (filter === "Pending") return !task.completed;
+  return true;
+});
 
+// Calculate stats for the dashboard
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter(t => t.completed).length;
   const pendingTasks = totalTasks - completedTasks;
 
+  // Button style for edit/delete/done buttons
   const btnStyle = {
   marginLeft: "5px",
   padding: "6px 10px",
@@ -71,9 +102,8 @@ function App() {
 
   // Render the dashboard UI
   return (
-    // Main container with padding
+    // Main container with padding and centered content
     
-
   <div style={{  padding: "30px",
       maxWidth: "600px",
       margin: "auto",
@@ -93,6 +123,7 @@ function App() {
       <p>Completed: {completedTasks}</p>
       <p>Pending: {pendingTasks}</p>
     </div>
+  
 
    {/*  INPUT SECTION */}
   <div style={{
@@ -108,6 +139,7 @@ function App() {
       placeholder="Enter task..."
       value={task}
       onChange={(e) => setTask(e.target.value)}
+      
           style={{
       padding: "10px",
       width: "70%",
@@ -117,6 +149,34 @@ function App() {
     }}
     />
     
+    <div>
+      <select
+      
+  value={category}
+  onChange={(e) => setCategory(e.target.value)}
+  div style={{ marginRight: "5px",marginTop: "10px", padding: "10px", border: "1px solid #aaa", borderRadius: "10px" }}
+>
+  <h5>Category</h5>
+  <option>General</option>
+  <option>Work</option>
+  <option>Study</option>
+  <option>Health</option>
+</select>
+
+<select
+
+  value={priority}
+  onChange={(e) => setPriority(e.target.value)}
+  div style={{ marginRight: "5px",marginTop: "10px", padding: "10px", border: "1px solid #aaa", borderRadius: "10px" }}
+>
+  <h5>Priority</h5>
+  <option>Low</option>
+  <option>Medium</option>
+  <option>High</option>
+  
+</select>
+
+
     <button onClick={addTask} style={{
     padding: "10px 15px",
     borderRadius: "8px",
@@ -125,7 +185,11 @@ function App() {
     color: "white",
     cursor: "pointer"
   }}>Add Task</button>
+    </div>
   </div>
+
+  
+
 
   {/* 🟩 TASK LIST SECTION */}
   <div style={{
@@ -136,9 +200,21 @@ function App() {
   }}>
     <h3 style={{ marginBottom: "10px" }}>Your Tasks</h3>
 
+  <div style={{ marginBottom: "10px", alignItems: "center", gap: "8px", }}>
+  <button onClick={() => setFilter("All")} style={filter === "All" ? { background: "#fcfa93" } : {}} >
+    All
+  </button>
+  <button onClick={() => setFilter("Completed")} style={filter === "Completed" ? { background: "#fcfa93" } : {}} >
+    Completed
+  </button>
+  <button onClick={() => setFilter("Pending")} style={filter === "Pending" ? { background: "#fcfa93" } : {}} >
+    Pending
+  </button>
+</div>
+
 
       <ul style={{ listStyle: "none", padding: 0 }}>
-          {tasks.map((task, index) => (
+          {filteredTasks.map((task, index) => (
           <li key={index} style={{
   marginBottom: "10px",
   padding: "12px",
@@ -174,7 +250,13 @@ function App() {
   >
     {task.text}
   </span>
-
+  <div style={{
+  fontSize: "12px",
+  marginTop: "5px",
+  color: "#555"
+  }}>
+    📂 {task.category} ⚡ {task.priority}
+  </div>
   <button onClick={() => handleDelete(index)} style={btnStyle}>Delete</button>
 
   <button onClick={() => {
