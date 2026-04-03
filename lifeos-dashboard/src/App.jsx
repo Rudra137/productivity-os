@@ -9,23 +9,38 @@ function App() {
   const [category, setCategory] = useState("General");
   const [priority, setPriority] = useState("Medium");
   const [filter, setFilter] = useState("All");
+  const [categoryFilter, setCategoryFilter] = useState("All");
   const [tasks, setTasks] = useState(() => {
   const saved = localStorage.getItem("tasks");
   return saved ? JSON.parse(saved) : [];
 });
+  const [streak, setStreak] = useState(() => {
+  const saved = localStorage.getItem("streak");
+  return saved ? JSON.parse(saved) : 0;
+});
+
+  const [lastCheckedDate, setLastCheckedDate] = useState(() => {
+  return localStorage.getItem("lastCheckedDate") || null;
+});
+
   
 
-
   // Functions for handling task input and list management
-
-
 
 useEffect(() => {
   console.log("Saving to localStorage:", tasks);
   localStorage.setItem("tasks", JSON.stringify(tasks));
 }, [tasks]);
 
+useEffect(() => {
+  localStorage.setItem("streak", JSON.stringify(streak));
+}, [streak]);
 
+useEffect(() => {
+  if (lastCheckedDate) {
+    localStorage.setItem("lastCheckedDate", lastCheckedDate);
+  }
+}, [lastCheckedDate]);
 
 
   //function to handle adding a new task to the list
@@ -82,8 +97,13 @@ useEffect(() => {
   (task) => task.date === today
 );
 const filteredTasks = todaysTasks.filter((task) => {
-  if (filter === "Completed") return task.completed;
-  if (filter === "Pending") return !task.completed;
+  // Status filter
+  if (filter === "Completed" && !task.completed) return false;
+  if (filter === "Pending" && task.completed) return false;
+
+  // Category filter
+  if (categoryFilter !== "All" && task.category !== categoryFilter) return false;
+
   return true;
 });
 
@@ -102,6 +122,29 @@ const filteredTasks = todaysTasks.filter((task) => {
   background: "#ddd"
   }
 
+  // Calculate today's stats
+  const total = todaysTasks.length;
+  const completed = todaysTasks.filter(t => t.completed).length;
+  const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
+
+  // Check for streaks
+  useEffect(() => {
+  const today = new Date().toLocaleDateString();
+
+  // Prevent multiple updates in same day
+  if (lastCheckedDate === today) return;
+
+  if (total > 0) {
+    if (percent >= 70) {
+      setStreak((prev) => prev + 1);
+    } else {
+      setStreak(0);
+    }
+
+    setLastCheckedDate(today);
+  }
+}, [tasks]); // runs when tasks update
+
   // Render the dashboard UI
   return (
     // Main container with padding and centered content
@@ -111,6 +154,53 @@ const filteredTasks = todaysTasks.filter((task) => {
       margin: "auto",
       fontFamily: "sans-serif" }}>
           <h1>LifeOS Dashboard</h1>
+
+
+{/* 🟩 PROGRESS BAR SECTION */}
+    <div style={{
+  marginBottom: "20px",
+  padding: "15px",
+  borderRadius: "12px",
+  background: "#f0f0f0"
+}}>
+  <h3>📊 Daily Progress</h3>
+
+  <div style={{
+    height: "20px",
+    background: "#ddd",
+    borderRadius: "10px",
+    overflow: "hidden"
+  }}>
+    <div style={{
+      width: `${percent}%`,
+      height: "100%",
+      background: percent === 100 ? "green" : percent > 50 ? "orange" : "red",
+      transition: "0.3s"
+      
+    }}>
+      
+    </div>
+  </div>
+
+  <p style={{ marginTop: "8px" }}>
+    {completed} / {total} tasks completed ({percent}%)
+  </p>
+
+    <div>
+    <div style={{
+  marginTop: "10px",    
+  marginBottom: "10px",
+  padding: "10px",
+  borderRadius: "10px",
+  background: "#fff3cd"
+}}>
+  <h3>🔥 Streak: {streak} days</h3>
+  <p>
+    Today: {Math.round(percent)}% completed
+  </p>
+  </div>
+  </div>
+</div>
 
 
       {/* 🟦 STATS SECTION */}
@@ -192,7 +282,6 @@ const filteredTasks = todaysTasks.filter((task) => {
 
   
 
-
   {/* 🟩 TASK LIST SECTION */}
   <div style={{
     padding: "15px",
@@ -201,7 +290,9 @@ const filteredTasks = todaysTasks.filter((task) => {
     
   }}>
     <h3 style={{ marginBottom: "10px" }}>Your Tasks</h3>
-
+    <div style={{ marginBottom: "10px" }}>
+</div>
+  <div>
   <div style={{ marginBottom: "10px", alignItems: "center", gap: "8px", }}>
   <button onClick={() => setFilter("All")} style={filter === "All" ? { background: "#fcfa93" } : {}} >
     All
@@ -212,12 +303,30 @@ const filteredTasks = todaysTasks.filter((task) => {
   <button onClick={() => setFilter("Pending")} style={filter === "Pending" ? { background: "#fcfa93" } : {}} >
     Pending
   </button>
+  </div>
+
+
+  <div style={{ marginBottom: "10px", alignItems: "center", gap: "8px", }}> 
+  Category:
+  <button onClick={() => setCategoryFilter("Work")}style={{background: categoryFilter === "Work" ? "#4CAF50" : "#ddd"}}>
+  Work
+  </button>
+  <button onClick={() => setCategoryFilter("Study")} style={{background: categoryFilter === "Study" ? "#4CAF50" : "#ddd"}}>
+    Study
+  </button>
+  <button onClick={() => setCategoryFilter("Health")} style={{background: categoryFilter === "Health" ? "#4CAF50" : "#ddd"}}>
+    Health
+  </button>
+  <button onClick={() => setCategoryFilter("General")} style={{background: categoryFilter === "General" ? "#4CAF50" : "#ddd"}}>
+    General
+  </button>
+  </div>
 </div>
 
 
-      <ul style={{ listStyle: "none", padding: 0 }}>
-          {filteredTasks.map((task, index) => (
-          <li key={index} style={{
+  <ul style={{ listStyle: "none", padding: 0 }}>
+    {filteredTasks.map((task, index) => (
+      <li key={index} style={{
   marginBottom: "10px",
   padding: "12px",
   borderRadius: "10px",
