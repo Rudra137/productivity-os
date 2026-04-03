@@ -6,24 +6,26 @@ function App() {
   const [task, setTask] = useState("");
   const [editIndex, setEditIndex] = useState(null);
   const [editText, setEditText] = useState("");
-  const [tasks, setTasks] = useState([]);
   const [category, setCategory] = useState("General");
   const [priority, setPriority] = useState("Medium");
   const [filter, setFilter] = useState("All");
+  const [tasks, setTasks] = useState(() => {
+  const saved = localStorage.getItem("tasks");
+  return saved ? JSON.parse(saved) : [];
+});
   
 
 
   // Functions for handling task input and list management
-  useEffect(() => {
-  const savedTasks = localStorage.getItem("tasks");
-  if (savedTasks) {
-    setTasks(JSON.parse(savedTasks));
-  }
-}, []);
+
+
 
 useEffect(() => {
+  console.log("Saving to localStorage:", tasks);
   localStorage.setItem("tasks", JSON.stringify(tasks));
 }, [tasks]);
+
+
 
 
   //function to handle adding a new task to the list
