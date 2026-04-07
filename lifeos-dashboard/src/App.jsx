@@ -1,7 +1,13 @@
 import { useState } from "react";
 import { useEffect } from "react";
+import {
+  DragDropContext,
+  Droppable,
+  Draggable
+} from "@hello-pangea/dnd";
 
 
+//Functional component for the main app and UseStates.
 function App() {
   const [task, setTask] = useState("");
   const [editIndex, setEditIndex] = useState(null);
@@ -22,11 +28,10 @@ function App() {
   const [lastCheckedDate, setLastCheckedDate] = useState(() => {
   return localStorage.getItem("lastCheckedDate") || null;
 });
-
+  
   
 
   // Functions for handling task input and list management
-
 useEffect(() => {
   console.log("Saving to localStorage:", tasks);
   localStorage.setItem("tasks", JSON.stringify(tasks));
@@ -94,9 +99,9 @@ useEffect(() => {
   
   const today = new Date().toLocaleDateString();
   const todaysTasks = tasks.filter(
-  (task) => task.date === today
-);
-const filteredTasks = todaysTasks.filter((task) => {
+  (task) => task.date === today);
+
+  const filteredTasks = todaysTasks.filter((task) => {
   // Status filter
   if (filter === "Completed" && !task.completed) return false;
   if (filter === "Pending" && task.completed) return false;
@@ -142,8 +147,37 @@ const filteredTasks = todaysTasks.filter((task) => {
     }
 
     setLastCheckedDate(today);
+    
   }
 }, [tasks]); // runs when tasks update
+
+const handleDragEnd = (result) => {
+  // If dropped outside list → do nothing
+  if (!result.destination) return;
+
+  // Step 1: Reorder visible tasks
+  const items = Array.from(filteredTasks);
+  const [movedItem] = items.splice(result.source.index, 1);
+  items.splice(result.destination.index, 0, movedItem);
+
+  // Step 2: Update main tasks state (THIS is your code)
+  setTasks((prev) => {
+    const newTasks = [...prev];
+
+    items.forEach((item, index) => {
+      const originalIndex = newTasks.findIndex(t => t.id === item.id);
+      newTasks.splice(originalIndex, 1);
+      newTasks.splice(index, 0, item);
+    });
+
+    return newTasks;
+  });
+};
+
+
+console.log("TASKS:", tasks);
+console.log("TODAY:", todaysTasks);
+console.log("FILTERED:", filteredTasks);
 
   // Render the dashboard UI
   return (
@@ -243,10 +277,15 @@ const filteredTasks = todaysTasks.filter((task) => {
     
     <div>
       <select
-      
   value={category}
   onChange={(e) => setCategory(e.target.value)}
-  div style={{ marginRight: "5px",marginTop: "10px", padding: "10px", border: "1px solid #aaa", borderRadius: "10px" }}
+  style={{
+    marginRight: "5px",
+    marginTop: "10px",
+    padding: "10px",
+    border: "1px solid #aaa",
+    borderRadius: "10px"
+  }}
 >
   <h5>Category</h5>
   <option>General</option>
@@ -255,11 +294,13 @@ const filteredTasks = todaysTasks.filter((task) => {
   <option>Health</option>
 </select>
 
-<select
 
+
+<select
   value={priority}
   onChange={(e) => setPriority(e.target.value)}
-  div style={{ marginRight: "5px",marginTop: "10px", padding: "10px", border: "1px solid #aaa", borderRadius: "10px" }}
+  style={{ 
+    marginRight: "5px",marginTop: "10px", padding: "10px", border: "1px solid #aaa", borderRadius: "10px" }}
 >
   <h5>Priority</h5>
   <option>Low</option>
@@ -283,113 +324,123 @@ const filteredTasks = todaysTasks.filter((task) => {
   
 
   {/* 🟩 TASK LIST SECTION */}
-  <div style={{
-    padding: "15px",
-    border: "1px solid #ccc",
-    borderRadius: "10px",
-    
-  }}>
-    <h3 style={{ marginBottom: "10px" }}>Your Tasks</h3>
-    <div style={{ marginBottom: "10px" }}>
-</div>
-  <div>
-  <div style={{ marginBottom: "10px", alignItems: "center", gap: "8px", }}>
-  <button onClick={() => setFilter("All")} style={filter === "All" ? { background: "#fcfa93" } : {}} >
-    All
-  </button>
-  <button onClick={() => setFilter("Completed")} style={filter === "Completed" ? { background: "#fcfa93" } : {}} >
-    Completed
-  </button>
-  <button onClick={() => setFilter("Pending")} style={filter === "Pending" ? { background: "#fcfa93" } : {}} >
-    Pending
-  </button>
-  </div>
-
-
-  <div style={{ marginBottom: "10px", alignItems: "center", gap: "8px", }}> 
-  Category:
-  <button onClick={() => setCategoryFilter("Work")}style={{background: categoryFilter === "Work" ? "#4CAF50" : "#ddd"}}>
-  Work
-  </button>
-  <button onClick={() => setCategoryFilter("Study")} style={{background: categoryFilter === "Study" ? "#4CAF50" : "#ddd"}}>
-    Study
-  </button>
-  <button onClick={() => setCategoryFilter("Health")} style={{background: categoryFilter === "Health" ? "#4CAF50" : "#ddd"}}>
-    Health
-  </button>
-  <button onClick={() => setCategoryFilter("General")} style={{background: categoryFilter === "General" ? "#4CAF50" : "#ddd"}}>
-    General
-  </button>
-  </div>
-</div>
-
-
-  <ul style={{ listStyle: "none", padding: 0 }}>
-    {filteredTasks.map((task, index) => (
-      <li key={index} style={{
-  marginBottom: "10px",
-  padding: "12px",
+<div style={{
+  padding: "15px",
+  border: "1px solid #ccc",
   borderRadius: "10px",
-  background: "white",
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  boxShadow: "0 2px 5px rgba(0,0,0,0.1)"
 }}>
-  {editIndex === index ? (
-    
 
-    // EDIT MODE
-    <div>
-      <input
-        type="text"
-        value={editText}
-        onChange={(e) => setEditText(e.target.value)}
-      />
-      <button onClick={() => {handleEdit(index, editText); setEditIndex(null); setEditText("")}} style={btnStyle}>Save</button>
-      <button onClick={() => setEditIndex(null)} style={btnStyle}>Cancel</button>
-    </div>
-  ) : (
-    // VIEW MODE
-    <div>
-  <span
-    style={{
-  textDecoration: task.completed ? "line-through" : "none",
-  color: task.completed ? "gray" : "black",
-  fontWeight: task.completed ? "normal" : "500"
-}}
-  >
-    {task.text}
-  </span>
-  <div style={{
-  fontSize: "12px",
-  marginTop: "5px",
-  color: "#555"
-  }}>
-    📂 {task.category} ⚡ {task.priority}
+  <h3 style={{ marginBottom: "10px" }}>Your Tasks</h3>
+
+  {/* ✅ FILTERS OUTSIDE UL */}
+  <div style={{ marginBottom: "10px" }}>
+    <button onClick={() => setFilter("All")}
+      style={filter === "All" ? { background: "#fcfa93" } : {}}>
+      All
+    </button>
+
+    <button onClick={() => setFilter("Completed")}
+      style={filter === "Completed" ? { background: "#fcfa93" } : {}}>
+      Completed
+    </button>
+
+    <button onClick={() => setFilter("Pending")}
+      style={filter === "Pending" ? { background: "#fcfa93" } : {}}>
+      Pending
+    </button>
   </div>
-  <button onClick={() => handleDelete(index)} style={btnStyle}>Delete</button>
 
-  <button onClick={() => {
-    setEditIndex(index);
-    setEditText(task.text);
-  }} style={btnStyle}>
-    Edit
-  </button>
+  <div style={{ marginBottom: "10px" }}>
+    Category:
+    <button onClick={() => setCategoryFilter("Work")}>Work</button>
+    <button onClick={() => setCategoryFilter("Study")}>Study</button>
+    <button onClick={() => setCategoryFilter("Health")}>Health</button>
+    <button onClick={() => setCategoryFilter("General")}>General</button>
+  </div>
 
-  <button onClick={() => toggleComplete(task.id)} style={btnStyle}>
-    {task.completed ? "Undo" : "Done"}
-  </button>
+  {/* ✅ CORRECT DND STRUCTURE */}
+  <DragDropContext onDragEnd={handleDragEnd}>
+    <Droppable droppableId="tasks">
+      {(provided) => (
+        <ul
+          {...provided.droppableProps}
+          ref={provided.innerRef}
+          style={{ listStyle: "none", padding: 0 }}
+        >
+
+          {filteredTasks.map((task, index) => (
+            <Draggable
+              key={task.id}
+              draggableId={task.id.toString()}
+              index={index}
+            >
+              {(provided) => (
+                <li
+                  ref={provided.innerRef}
+                  {...provided.draggableProps}
+                  {...provided.dragHandleProps}
+                  style={{
+                    marginBottom: "10px",
+                    padding: "12px",
+                    borderRadius: "10px",
+                    background: "white",
+                    boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
+                    ...provided.draggableProps.style
+                  }}
+                >
+
+                  {editIndex === index ? (
+                    <div>
+                      <input
+                        value={editText}
+                        onChange={(e) => setEditText(e.target.value)}
+                      />
+                      <button onClick={() => {
+                        handleEdit(index, editText);
+                        setEditIndex(null);
+                        setEditText("");
+                      }}>Save</button>
+                      <button onClick={() => setEditIndex(null)}>Cancel</button>
+                    </div>
+                  ) : (
+                    <div>
+                      <span style={{
+                        textDecoration: task.completed ? "line-through" : "none"
+                      }}>
+                        {task.text}
+                      </span>
+
+                      <div style={{ fontSize: "12px" }}>
+                        📂 {task.category} ⚡ {task.priority}
+                      </div>
+
+                      <button onClick={() => handleDelete(index)}>Delete</button>
+                      <button onClick={() => {
+                        setEditIndex(index);
+                        setEditText(task.text);
+                      }}>Edit</button>
+                      <button onClick={() => toggleComplete(task.id)}>
+                        {task.completed ? "Undo" : "Done"}
+                      </button>
+                    </div>
+                  )}
+
+                </li>
+              )}
+            </Draggable>
+          ))}
+
+          {provided.placeholder}
+
+        </ul>
+      )}
+    </Droppable>
+  </DragDropContext>
+
 </div>
-          )}
-        </li>
-       ))}
-      </ul>
-    </div>
-  </div>  
-
-  );
-}
+</div>
+);
+};
 
 
 export default App;
