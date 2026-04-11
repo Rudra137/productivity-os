@@ -9,6 +9,7 @@ import {
 
 //Functional component for the main app and UseStates.
 function App() {
+//STATE VARIABLES  
   const [task, setTask] = useState("");
   const [editIndex, setEditIndex] = useState(null);
   const [editText, setEditText] = useState("");
@@ -29,25 +30,85 @@ function App() {
   return localStorage.getItem("lastCheckedDate") || null;
 });
   
-  
 
-  // Functions for handling task input and list management
-useEffect(() => {
-  console.log("Saving to localStorage:", tasks);
-  localStorage.setItem("tasks", JSON.stringify(tasks));
-}, [tasks]);
+//DERIVED DATA 
+// 📅 Today
+const today = new Date().toLocaleDateString();
 
-useEffect(() => {
-  localStorage.setItem("streak", JSON.stringify(streak));
-}, [streak]);
+// 📊 Today's tasks
+const todaysTasks = tasks.filter(t => t.date === today);
 
-useEffect(() => {
-  if (lastCheckedDate) {
-    localStorage.setItem("lastCheckedDate", lastCheckedDate);
+// 🎯 Filtered tasks
+const filteredTasks = todaysTasks.filter((task) => {
+  if (filter === "Completed" && !task.completed) return false;
+  if (filter === "Pending" && task.completed) return false;
+  if (categoryFilter !== "All" && task.category !== categoryFilter) return false;
+  return true;
+});
+
+// 📊 Weekly data (FIXED POSITION)
+const getWeekData = () => {
+  const now = new Date();
+
+  const last7Days = new Set(
+  [...Array(7)].map((_, i) => {
+    const d = new Date();
+    d.setDate(now.getDate() - i);
+    return d.toLocaleDateString();
+  })
+);
+
+const weekTasks = tasks.filter(t => last7Days.has(t.date));
+
+  const categoryCount = {
+    Health: 0,
+    Work: 0,
+    Study: 0
+  };
+
+  weekTasks.forEach(task => {
+    if (!task.completed) return;
+
+    if (categoryCount[task.category] !== undefined) {
+  categoryCount[task.category]++;
+}
+  });
+
+  return categoryCount;
+};
+
+const weeklyData = getWeekData();
+
+// 📏 Max value
+const maxValue = Math.max(
+  weeklyData.Health,
+  weeklyData.Work,
+  weeklyData.Study,
+  1
+);
+
+// Calculate today's stats
+const total = todaysTasks.length;
+const completed = todaysTasks.filter(t => t.completed).length;
+const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
+
+// Calculate stats for the dashboard
+  const totalTasks = tasks.length;
+  const completedTasks = tasks.filter(t => t.completed).length;
+  const pendingTasks = totalTasks - completedTasks;
+
+
+  // Button style for edit/delete/done buttons
+  const btnStyle = {
+  marginLeft: "5px",
+  padding: "6px 10px",
+  borderRadius: "6px",
+  border: "none",
+  cursor: "pointer",
+  background: "#ddd"
   }
-}, [lastCheckedDate]);
 
-
+//FUNCTIONS
   //function to handle adding a new task to the list
   const addTask = () => {
   if (task.trim() === "") return;
@@ -69,10 +130,9 @@ useEffect(() => {
 
 
   // Function to delete a task by index
-  const handleDelete = (indextoDelete) => {
-    const updatedList = tasks.filter((_, i) => i !== indextoDelete);
-    setTasks(updatedList);
-  };
+const handleDelete = (id) => {
+  setTasks((prev) => prev.filter(task => task.id !== id));
+};
 
   // Function to edit a task by index
   const handleEdit = (indexToEdit, newText) => {
@@ -96,61 +156,8 @@ useEffect(() => {
     return updated;
   });
 };
-  
-  const today = new Date().toLocaleDateString();
-  const todaysTasks = tasks.filter(
-  (task) => task.date === today);
 
-  const filteredTasks = todaysTasks.filter((task) => {
-  // Status filter
-  if (filter === "Completed" && !task.completed) return false;
-  if (filter === "Pending" && task.completed) return false;
-
-  // Category filter
-  if (categoryFilter !== "All" && task.category !== categoryFilter) return false;
-
-  return true;
-});
-
-// Calculate stats for the dashboard
-  const totalTasks = tasks.length;
-  const completedTasks = tasks.filter(t => t.completed).length;
-  const pendingTasks = totalTasks - completedTasks;
-
-  // Button style for edit/delete/done buttons
-  const btnStyle = {
-  marginLeft: "5px",
-  padding: "6px 10px",
-  borderRadius: "6px",
-  border: "none",
-  cursor: "pointer",
-  background: "#ddd"
-  }
-
-  // Calculate today's stats
-  const total = todaysTasks.length;
-  const completed = todaysTasks.filter(t => t.completed).length;
-  const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
-
-  // Check for streaks
-  useEffect(() => {
-  const today = new Date().toLocaleDateString();
-
-  // Prevent multiple updates in same day
-  if (lastCheckedDate === today) return;
-
-  if (total > 0) {
-    if (percent >= 70) {
-      setStreak((prev) => prev + 1);
-    } else {
-      setStreak(0);
-    }
-
-    setLastCheckedDate(today);
-    
-  }
-}, [tasks]); // runs when tasks update
-
+// Handle drag-and-drop reordering
 const handleDragEnd = (result) => {
   // If dropped outside list → do nothing
   if (!result.destination) return;
@@ -173,11 +180,51 @@ const handleDragEnd = (result) => {
     return newTasks;
   });
 };
+  
+
+
+// 🧠 EFFECTS
+  // Functions for handling task input and list management
+useEffect(() => {
+  console.log("Saving to localStorage:", tasks);
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+}, [tasks]);
+
+useEffect(() => {
+  localStorage.setItem("streak", JSON.stringify(streak));
+}, [streak]);
+
+useEffect(() => {
+  if (lastCheckedDate) {
+    localStorage.setItem("lastCheckedDate", lastCheckedDate);
+  }
+}, [lastCheckedDate]);
+
+  useEffect(() => {
+  const today = new Date().toLocaleDateString();
+
+  // Prevent multiple updates in same day
+  if (lastCheckedDate === today) return;
+
+  if (total > 0) {
+    if (percent >= 70) {
+      setStreak((prev) => prev + 1);
+    } else {
+      setStreak(0);
+    }
+
+    setLastCheckedDate(today);
+    
+  }
+}, [tasks]); // runs when tasks update
+
+
+
+
 
 
 console.log("TASKS:", tasks);
-console.log("TODAY:", todaysTasks);
-console.log("FILTERED:", filteredTasks);
+
 
   // Render the dashboard UI
   return (
@@ -276,7 +323,9 @@ console.log("FILTERED:", filteredTasks);
     />
     
     <div>
-      <select
+
+    {/* CATEGORY SELECTOR */}
+  <select
   value={category}
   onChange={(e) => setCategory(e.target.value)}
   style={{
@@ -286,7 +335,8 @@ console.log("FILTERED:", filteredTasks);
     border: "1px solid #aaa",
     borderRadius: "10px"
   }}
->
+  >
+  
   <h5>Category</h5>
   <option>General</option>
   <option>Work</option>
@@ -295,7 +345,7 @@ console.log("FILTERED:", filteredTasks);
 </select>
 
 
-
+{/* PRIORITY SELECTOR */}
 <select
   value={priority}
   onChange={(e) => setPriority(e.target.value)}
@@ -309,7 +359,7 @@ console.log("FILTERED:", filteredTasks);
   
 </select>
 
-
+{/* ADD TASK BUTTON */}
     <button onClick={addTask} style={{
     padding: "10px 15px",
     borderRadius: "8px",
@@ -321,7 +371,42 @@ console.log("FILTERED:", filteredTasks);
     </div>
   </div>
 
-  
+    {/* 🟦 WEEKLY FOCUS SECTION */}
+  <div style={{
+  marginBottom: "20px",
+  padding: "15px",
+  borderRadius: "12px",
+  background: "#f8f9fa"
+}}>
+  <h3>📊 Weekly Focus</h3>
+
+  {["Health", "Work", "Study"].map((cat) => (
+    <div key={cat} style={{ marginBottom: "10px" }}>
+      <div style={{ fontSize: "14px", marginBottom: "3px" }}>
+        {cat} ({weeklyData[cat]})
+      </div>
+
+      <div style={{
+        height: "15px",
+        background: "#ddd",
+        borderRadius: "10px",
+        overflow: "hidden"
+      }}>
+        <div style={{
+          width: `${(weeklyData[cat] / maxValue) * 100}%`,
+          height: "100%",
+          background:
+            cat === "Health"
+              ? "#4CAF50"
+              : cat === "Work"
+              ? "#2196F3"
+              : "#FF9800",
+          transition: "0.3s"
+        }} />
+      </div>
+    </div>
+  ))}
+</div>
 
   {/* 🟩 TASK LIST SECTION */}
 <div style={{
@@ -414,7 +499,7 @@ console.log("FILTERED:", filteredTasks);
                         📂 {task.category} ⚡ {task.priority}
                       </div>
 
-                      <button onClick={() => handleDelete(index)}>Delete</button>
+                      <button onClick={() => handleDelete(task.id)}>Delete</button>
                       <button onClick={() => {
                         setEditIndex(index);
                         setEditText(task.text);
