@@ -32,6 +32,8 @@ function App() {
   
 
 //DERIVED DATA 
+
+const days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 // 📅 Today
 const today = new Date().toLocaleDateString();
 
@@ -47,45 +49,29 @@ const filteredTasks = todaysTasks.filter((task) => {
 });
 
 // 📊 Weekly data (FIXED POSITION)
-const getWeekData = () => {
-  const now = new Date();
-
-  const last7Days = new Set(
-  [...Array(7)].map((_, i) => {
-    const d = new Date();
-    d.setDate(now.getDate() - i);
-    return d.toLocaleDateString();
-  })
-);
-
-const weekTasks = tasks.filter(t => last7Days.has(t.date));
-
-  const categoryCount = {
-    Health: 0,
-    Work: 0,
-    Study: 0
+const getWeeklyTrend = () => {
+  const result = {
+    Work: Array(7).fill(0),
+    Health: Array(7).fill(0),
+    Study: Array(7).fill(0)
   };
 
-  weekTasks.forEach(task => {
+  tasks.forEach(task => {
     if (!task.completed) return;
 
-    if (categoryCount[task.category] !== undefined) {
-  categoryCount[task.category]++;
-}
+    const date = new Date(task.date);
+    const dayIndex = date.getDay(); // 0-6
+
+    if (result[task.category]) {
+      result[task.category][dayIndex]++;
+    }
   });
 
-  return categoryCount;
+  return result;
 };
 
-const weeklyData = getWeekData();
+const weeklyTrend = getWeeklyTrend();
 
-// 📏 Max value
-const maxValue = Math.max(
-  weeklyData.Health,
-  weeklyData.Work,
-  weeklyData.Study,
-  1
-);
 
 // Calculate today's stats
 const total = todaysTasks.length;
@@ -96,17 +82,13 @@ const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter(t => t.completed).length;
   const pendingTasks = totalTasks - completedTasks;
-
-
-  // Button style for edit/delete/done buttons
-  const btnStyle = {
-  marginLeft: "5px",
-  padding: "6px 10px",
-  borderRadius: "6px",
-  border: "none",
-  cursor: "pointer",
-  background: "#ddd"
-  }
+  const weeklyData = {
+    Work: tasks.filter(t => t.category === "Work" && t.completed).length,
+    Health: tasks.filter(t => t.category === "Health" && t.completed).length,
+    Study: tasks.filter(t => t.category === "Study" && t.completed).length
+  };
+  const maxValue = Math.max(...Object.values(weeklyData), 1); // avoid division by zero
+  const maxDayValue = Math.max(...weeklyTrend.Work, ...weeklyTrend.Health, ...weeklyTrend.Study, 1);
 
 //FUNCTIONS
   //function to handle adding a new task to the list
@@ -370,6 +352,79 @@ console.log("TASKS:", tasks);
   }}>Add Task</button>
     </div>
   </div>
+
+
+{/* 🟦 WEEKLY TREND SECTION */}
+
+
+<div style={{
+  marginBottom: "20px",
+  padding: "15px",
+  borderRadius: "12px",
+  background: "#eef2f7"
+}}>
+  <h3>📈 Productivity Overview</h3>
+
+  <div style={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "flex-end",
+    height: "120px"
+  }}>
+    
+    {days.map((day, i) => (
+      <div key={i} style={{ textAlign: "center" }}>
+        
+        {/* Bars group */}
+        <div style={{
+          display: "flex",
+          gap: "3px",
+          alignItems: "flex-end",
+          height: "100px"
+        }}>
+          
+          {/* Work */}
+          <div style={{
+            width: "8px",
+            height: `${weeklyTrend.Work[i] * 20}px`,
+            background: "#4A90E2",
+            borderRadius: "3px"
+          }} />
+
+          {/* Health */}
+          <div style={{
+            width: "8px",
+            height: `${weeklyTrend.Health[i] * 20}px`,
+            background: "#50C878",
+            borderRadius: "3px"
+          }} />
+
+          {/* Study */}
+          <div style={{
+            width: "8px",
+            height: `${weeklyTrend.Study[i] * 20}px`,
+            background: "#FFA500",
+            borderRadius: "3px"
+          }} />
+
+        </div>
+
+        {/* Day label */}
+        <div style={{ fontSize: "10px", marginTop: "5px" }}>
+          {day}
+        </div>
+
+      </div>
+    ))}
+
+  </div>
+
+  {/* Legend */}
+  <div style={{ marginTop: "10px", fontSize: "12px" }}>
+    🔵 Work &nbsp; 🟢 Health &nbsp; 🟠 Study
+  </div>
+
+</div>
 
     {/* 🟦 WEEKLY FOCUS SECTION */}
   <div style={{
