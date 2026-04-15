@@ -5,6 +5,11 @@ import {
   Droppable,
   Draggable
 } from "@hello-pangea/dnd";
+import {
+  AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, Legend
+} from "recharts";
+
+
 
 
 //Functional component for the main app and UseStates.
@@ -48,6 +53,7 @@ const filteredTasks = todaysTasks.filter((task) => {
   return true;
 });
 
+
 // 📊 Weekly data (FIXED POSITION)
 const getWeeklyTrend = () => {
   const result = {
@@ -70,6 +76,46 @@ const getWeeklyTrend = () => {
   return result;
 };
 
+const getTaskScore = (task) => {
+  if (task.priority === "High") return 3;
+  if (task.priority === "Medium") return 2;
+  return 1; // Low
+};
+
+// 📊 Weekly chart data (FIXED POSITION)
+const getWeeklyChartData = () => {
+  const now = new Date();
+
+  return [...Array(7)].map((_, i) => {
+    const d = new Date();
+    d.setDate(now.getDate() - i);
+
+    const dateStr = d.toLocaleDateString();
+    const dayName = d.toLocaleDateString("en-US", { weekday: "short" });
+
+    const dayTasks = tasks.filter(t => t.date === dateStr && t.completed);
+
+    return {
+      day: dayName,
+
+      Work: dayTasks
+        .filter(t => t.category === "Work")
+        .reduce((sum, t) => sum + getTaskScore(t), 0),
+
+      Health: dayTasks
+        .filter(t => t.category === "Health")
+        .reduce((sum, t) => sum + getTaskScore(t), 0),
+
+      Study: dayTasks
+        .filter(t => t.category === "Study")
+        .reduce((sum, t) => sum + getTaskScore(t), 0),
+    };
+  }).reverse();
+};
+
+
+const chartData = getWeeklyChartData();
+
 const weeklyTrend = getWeeklyTrend();
 
 
@@ -87,7 +133,7 @@ const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
     Health: tasks.filter(t => t.category === "Health" && t.completed).length,
     Study: tasks.filter(t => t.category === "Study" && t.completed).length
   };
-  const maxValue = Math.max(...Object.values(weeklyData), 1); // avoid division by zero
+  const maxValue = Math.max(...Object.values(weeklyData), 1); 
   const maxDayValue = Math.max(...weeklyTrend.Work, ...weeklyTrend.Health, ...weeklyTrend.Study, 1);
 
 //FUNCTIONS
@@ -356,75 +402,66 @@ console.log("TASKS:", tasks);
 
 {/* 🟦 WEEKLY TREND SECTION */}
 
+<AreaChart
+  width={650}
+  height={300}
+  data={chartData}
+  margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+>
+  <defs>
+    <linearGradient id="colorWork" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
+      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+    </linearGradient>
 
-<div style={{
-  marginBottom: "20px",
-  padding: "15px",
-  borderRadius: "12px",
-  background: "#eef2f7"
-}}>
-  <h3>📈 Productivity Overview</h3>
+    <linearGradient id="colorHealth" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="5%" stopColor="#22c55e" stopOpacity={0.8}/>
+      <stop offset="95%" stopColor="#22c55e" stopOpacity={0}/>
+    </linearGradient>
 
-  <div style={{
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-end",
-    height: "120px"
-  }}>
-    
-    {days.map((day, i) => (
-      <div key={i} style={{ textAlign: "center" }}>
-        
-        {/* Bars group */}
-        <div style={{
-          display: "flex",
-          gap: "3px",
-          alignItems: "flex-end",
-          height: "100px"
-        }}>
-          
-          {/* Work */}
-          <div style={{
-            width: "8px",
-            height: `${weeklyTrend.Work[i] * 20}px`,
-            background: "#4A90E2",
-            borderRadius: "3px"
-          }} />
+    <linearGradient id="colorStudy" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="5%" stopColor="#f97316" stopOpacity={0.8}/>
+      <stop offset="95%" stopColor="#f97316" stopOpacity={0}/>
+    </linearGradient>
+  </defs>
 
-          {/* Health */}
-          <div style={{
-            width: "8px",
-            height: `${weeklyTrend.Health[i] * 20}px`,
-            background: "#50C878",
-            borderRadius: "3px"
-          }} />
+  <CartesianGrid strokeDasharray="3 3" />
 
-          {/* Study */}
-          <div style={{
-            width: "8px",
-            height: `${weeklyTrend.Study[i] * 20}px`,
-            background: "#FFA500",
-            borderRadius: "3px"
-          }} />
+  <XAxis dataKey="day" />
+  <YAxis />
 
-        </div>
+  <Tooltip />
+  <Legend />
 
-        {/* Day label */}
-        <div style={{ fontSize: "10px", marginTop: "5px" }}>
-          {day}
-        </div>
+  <Area
+    type="monotone"
+    dataKey="Work"
+    stroke="#3b82f6"
+    fillOpacity={1}
+    fill="url(#colorWork)"
+    strokeWidth={3}
+  />
 
-      </div>
-    ))}
+  <Area
+    type="monotone"
+    dataKey="Health"
+    stroke="#22c55e"
+    fillOpacity={1}
+    fill="url(#colorHealth)"
+    strokeWidth={3}
+  />
 
-  </div>
+  <Area
+    type="monotone"
+    dataKey="Study"
+    stroke="#f97316"
+    fillOpacity={1}
+    fill="url(#colorStudy)"
+    strokeWidth={3}
+  />
 
-  {/* Legend */}
-  <div style={{ marginTop: "10px", fontSize: "12px" }}>
-    🔵 Work &nbsp; 🟢 Health &nbsp; 🟠 Study
-  </div>
+</AreaChart>
 
-</div>
 
     {/* 🟦 WEEKLY FOCUS SECTION */}
   <div style={{
@@ -498,7 +535,7 @@ console.log("TASKS:", tasks);
     <button onClick={() => setCategoryFilter("General")}>General</button>
   </div>
 
-  {/* ✅ CORRECT DND STRUCTURE */}
+  {/* DRAG AND DROP CONTEXT */}
   <DragDropContext onDragEnd={handleDragEnd}>
     <Droppable droppableId="tasks">
       {(provided) => (
