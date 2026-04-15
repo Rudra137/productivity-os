@@ -6,8 +6,10 @@ import {
   Draggable
 } from "@hello-pangea/dnd";
 import {
-  AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, Legend
+  AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, Legend, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar
 } from "recharts";
+
+
 
 
 
@@ -34,53 +36,15 @@ function App() {
   const [lastCheckedDate, setLastCheckedDate] = useState(() => {
   return localStorage.getItem("lastCheckedDate") || null;
 });
-  
-
-//DERIVED DATA 
-
-const days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-// 📅 Today
-const today = new Date().toLocaleDateString();
-
-// 📊 Today's tasks
-const todaysTasks = tasks.filter(t => t.date === today);
-
-// 🎯 Filtered tasks
-const filteredTasks = todaysTasks.filter((task) => {
-  if (filter === "Completed" && !task.completed) return false;
-  if (filter === "Pending" && task.completed) return false;
-  if (categoryFilter !== "All" && task.category !== categoryFilter) return false;
-  return true;
-});
 
 
-// 📊 Weekly data (FIXED POSITION)
-const getWeeklyTrend = () => {
-  const result = {
-    Work: Array(7).fill(0),
-    Health: Array(7).fill(0),
-    Study: Array(7).fill(0)
-  };
-
-  tasks.forEach(task => {
-    if (!task.completed) return;
-
-    const date = new Date(task.date);
-    const dayIndex = date.getDay(); // 0-6
-
-    if (result[task.category]) {
-      result[task.category][dayIndex]++;
-    }
-  });
-
-  return result;
-};
-
+// Helper functions to assign scores based on priority
 const getTaskScore = (task) => {
   if (task.priority === "High") return 3;
   if (task.priority === "Medium") return 2;
   return 1; // Low
 };
+
 
 // 📊 Weekly chart data (FIXED POSITION)
 const getWeeklyChartData = () => {
@@ -113,10 +77,65 @@ const getWeeklyChartData = () => {
   }).reverse();
 };
 
+// 🧠 Life Radar data (FIXED POSITION)
+const getLifeRadarData = () => {
+  const now = new Date();
+  const last7Days = [...Array(7)].map((_, i) => {
+    const d = new Date();
+    d.setDate(now.getDate() - i);
+    return d.toLocaleDateString();
+  });
 
+  const weekTasks = tasks.filter(
+    t => last7Days.includes(t.date) && t.completed
+  );
+
+  const domainScores = {
+    Health: 0,
+    Productivity: 0,
+    Skills: 0,
+    Money: 0,
+    PersonalGrowth: 0,
+    Relationships: 0
+  };
+  const max = Math.max(...Object.values(domainScores), 1);
+  weekTasks.forEach(task => {
+    const score = getTaskScore(task);
+
+    if (task.category === "Health") domainScores.Health += score;
+    if (task.category === "Work") domainScores.Productivity += score;
+    if (task.category === "Study") domainScores.Skills += score;
+
+    // future-ready mappings
+    if (task.category === "Finance") domainScores.Money += score;
+    if (task.category === "Spiritual") domainScores.PersonalGrowth += score;
+    if (task.category === "Family") domainScores.Relationships += score;
+  });
+
+  return Object.keys(domainScores).map(key => ({
+    subject: key,
+    value: (domainScores[key] / max) * 10 // normalize to 10
+  }));
+};
+
+
+//DERIVED DATA 
+
+// 📅 Today
+const today = new Date().toLocaleDateString();
+
+// 📊 Today's tasks
+const todaysTasks = tasks.filter(t => t.date === today);
+
+// 🎯 Filtered tasks
+const filteredTasks = todaysTasks.filter((task) => {
+  if (filter === "Completed" && !task.completed) return false;
+  if (filter === "Pending" && task.completed) return false;
+  if (categoryFilter !== "All" && task.category !== categoryFilter) return false;
+  return true;
+});
 const chartData = getWeeklyChartData();
-
-const weeklyTrend = getWeeklyTrend();
+const radarData = getLifeRadarData();
 
 
 // Calculate today's stats
@@ -134,7 +153,11 @@ const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
     Study: tasks.filter(t => t.category === "Study" && t.completed).length
   };
   const maxValue = Math.max(...Object.values(weeklyData), 1); 
-  const maxDayValue = Math.max(...weeklyTrend.Work, ...weeklyTrend.Health, ...weeklyTrend.Study, 1);
+  const todayScore = todaysTasks
+  .filter(t => t.completed)
+  .reduce((sum, t) => sum + getTaskScore(t), 0);
+
+
 
 //FUNCTIONS
   //function to handle adding a new task to the list
@@ -273,7 +296,8 @@ console.log("TASKS:", tasks);
   background: "#f0f0f0"
 }}>
   <h3>📊 Daily Progress</h3>
-
+  <p>⚡ Productivity Score Today: {todayScore}</p>
+  
   <div style={{
     height: "20px",
     background: "#ddd",
@@ -462,6 +486,22 @@ console.log("TASKS:", tasks);
 
 </AreaChart>
 
+{/* LIFE BALANCE RADAR SECTION */}
+<RadarChart outerRadius={120} width={400} height={400} data={radarData} style={{ margin: "20px auto" }} padding={{ top: 20, right: 30, left: 20, bottom: 15 }}>
+  <PolarGrid />
+  <PolarAngleAxis dataKey="subject" />
+  <PolarRadiusAxis />
+
+  <Radar
+    name="Life Balance"
+    dataKey="value"
+    stroke="#3b82f6"
+    fill="#3b82f6"
+    fillOpacity={0.6}
+  />
+
+  <Legend />
+</RadarChart>
 
     {/* 🟦 WEEKLY FOCUS SECTION */}
   <div style={{
