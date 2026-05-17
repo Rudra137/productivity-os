@@ -21,8 +21,8 @@ function RadarChartBox({ radarData }) {
 
       <RadarChart
         outerRadius={120}
-        width={540}
-        height={400}
+        width={400}
+        height={360}
         data={radarData}
       >
         <PolarGrid />

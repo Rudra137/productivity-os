@@ -162,18 +162,22 @@ console.log("TASKS:", tasks);
     
     
   <div style={{  padding: "30px",
-      maxWidth: "600px",
+      maxWidth: "1400px",
       margin: "auto",
       fontFamily: "sans-serif" }}>
           <h1>LifeOS Dashboard</h1>
 
 
 {/* 🟦 WEEKLY TREND SECTION */}
-<WeeklyChart chartData={chartData} />
-
-{/* LIFE BALANCE RADAR SECTION */}
-<div style={{backgroundColor: "#fefff7", padding: "15px", borderRadius: "12px"}}>
-<RadarChartBox radarData={radarData} />
+<div
+  style={{
+    display: "flex",
+    gap: "20px",
+    marginBottom: "20px"
+  }}
+>
+  <WeeklyChart chartData={chartData} />
+  <RadarChartBox radarData={radarData} />
 </div>
     {/* 🟦 WEEKLY FOCUS SECTION */}
   <div style={{

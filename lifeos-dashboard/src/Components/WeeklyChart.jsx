@@ -14,7 +14,7 @@ function WeeklyChart({ chartData }) {
       <h3>📈 Weekly Trend</h3>
 
       <AreaChart
-        width={650}
+        width={500}
         height={300}
         data={chartData}
         margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
