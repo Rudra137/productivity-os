@@ -48,18 +48,22 @@ function TaskFilters({ filter, setFilter, categoryFilter, setCategoryFilter }) {
 
 // 🎨 Styles
 const buttonStyle = {
-  marginRight: "5px",
-  padding: "5px 10px",
-  borderRadius: "6px",
-  border: "1px solid #ccc",
-  background: "#f5f5f5",
-  cursor: "pointer"
+  marginRight: "8px",
+  padding: "10px 16px",
+  borderRadius: "10px",
+  border: "none",
+  background: "#e2e8f0",
+  cursor: "pointer",
+  fontSize: "14px",
+  fontWeight: "500",
+  color: "#334155",
+  transition: "0.2s"
 };
 
 const activeStyle = {
   ...buttonStyle,
-  background: "#fcfa93",
-  fontWeight: "bold"
+  background: "#3b82f6",
+  color: "white"
 };
 
 export default TaskFilters;

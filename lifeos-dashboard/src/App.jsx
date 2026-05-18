@@ -161,11 +161,26 @@ console.log("TASKS:", tasks);
     
     
     
-  <div style={{  padding: "30px",
-      maxWidth: "1400px",
-      margin: "auto",
-      fontFamily: "sans-serif" }}>
-          <h1>LifeOS Dashboard</h1>
+  <div
+  style={{
+    padding: "30px",
+    maxWidth: "1400px",
+    margin: "auto",
+    fontFamily: "sans-serif",
+    minHeight: "100vh",
+    background: "#f4f7fb"
+  }}
+>
+          <h1
+  style={{
+    fontSize: "36px",
+    fontWeight: "700",
+    marginBottom: "30px",
+    color: "#1e293b"
+  }}
+>
+  LifeOS Dashboard
+</h1>
 
 
 {/* 🟦 WEEKLY TREND SECTION */}
@@ -173,7 +188,8 @@ console.log("TASKS:", tasks);
   style={{
     display: "flex",
     gap: "20px",
-    marginBottom: "20px"
+    marginBottom: "20px",
+    backgroundColor: "#e0f2fe"
   }}
 >
   <WeeklyChart chartData={chartData} />
@@ -186,7 +202,12 @@ console.log("TASKS:", tasks);
   borderRadius: "12px",
   background: "#f8f9fa"
 }}>
-  <h3>📊 Weekly Focus</h3>
+  <h3 style={{
+    fontSize: "20px",
+    fontWeight: "600",
+    marginBottom: "15px",
+    color: "#334155"
+  }}>📊 Weekly Focus</h3>
 
   {["Health", "Work", "Study"].map((cat) => (
     <div key={cat} style={{ marginBottom: "10px" }}>

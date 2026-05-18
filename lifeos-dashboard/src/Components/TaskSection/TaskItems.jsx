@@ -15,6 +15,34 @@ function TaskItems({
 }) {
   const isEditing = editId === task.id;
 
+  const actionButton = {
+  padding: "8px 12px",
+  border: "none",
+  borderRadius: "8px",
+  cursor: "pointer",
+  fontSize: "13px",
+  fontWeight: "500",
+  marginRight: "8px",
+  marginTop: "10px"
+};
+
+const deleteStyle = {
+  ...actionButton,
+  background: "#fee2e2",
+  color: "#dc2626"
+};
+
+const editStyle = {
+  ...actionButton,
+  background: "#dbeafe",
+  color: "#2563eb"
+};
+
+const doneStyle = {
+  ...actionButton,
+  background: task.completed ? "#e2e8f0" : "#dcfce7",
+  color: task.completed ? "#475569" : "#16a34a"
+};
   return (
     <li
       ref={provided.innerRef}
@@ -63,23 +91,29 @@ function TaskItems({
           <div style={{ fontSize: "12px" }}>
             📂 {task.category} ⚡ {task.priority}
           </div>
+<button
+  style={deleteStyle}
+  onClick={() => handleDelete(task.id)}
+>
+  Delete
+</button>
 
-          <button onClick={() => handleDelete(task.id)}>
-            Delete
-          </button>
+<button
+  style={editStyle}
+  onClick={() => {
+    setEditId(task.id);
+    setEditText(task.text);
+  }}
+>
+  Edit
+</button>
 
-          <button
-            onClick={() => {
-              setEditId(task.id);
-              setEditText(task.text);
-            }}
-          >
-            Edit
-          </button>
-
-          <button onClick={() => toggleComplete(task.id)}>
-            {task.completed ? "Undo" : "Done"}
-          </button>
+<button
+  style={doneStyle}
+  onClick={() => toggleComplete(task.id)}
+>
+  {task.completed ? "Undo" : "Done"}
+</button>
         </div>
       )}
     </li>

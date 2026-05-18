@@ -10,12 +10,27 @@ import {
 
 function WeeklyChart({ chartData }) {
   return (
-    <div style={{ marginBottom: "20px" }}>
-      <h3>📈 Weekly Trend</h3>
+    <div style={{
+  background: "#ffffff",
+  padding: "20px",
+  borderRadius: "16px",
+  boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+  flex: 1
+}}>
+      <h3
+  style={{
+    fontSize: "20px",
+    fontWeight: "600",
+    marginBottom: "15px",
+    color: "#334155"
+  }}
+>
+  📈 Weekly Trend
+</h3>
 
       <AreaChart
-        width={500}
-        height={300}
+        width={700}
+        height={350}
         data={chartData}
         margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
       >

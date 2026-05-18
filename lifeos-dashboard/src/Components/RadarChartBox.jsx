@@ -11,18 +11,19 @@ function RadarChartBox({ radarData }) {
   return (
     <div
       style={{
-        backgroundColor: "#fefff7",
-        padding: "15px",
-        borderRadius: "12px",
-        marginBottom: "20px"
+  background: "#ffffff",
+  padding: "20px",
+  borderRadius: "16px",
+  boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+  flex: 1
       }}
     >
       <h3>🧭 Life Balance</h3>
 
       <RadarChart
         outerRadius={120}
-        width={400}
-        height={360}
+        width={540}
+        height={450}
         data={radarData}
       >
         <PolarGrid />
