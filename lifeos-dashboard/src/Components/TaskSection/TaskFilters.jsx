@@ -49,7 +49,7 @@ function TaskFilters({ filter, setFilter, categoryFilter, setCategoryFilter }) {
 // 🎨 Styles
 const buttonStyle = {
   marginRight: "8px",
-  padding: "10px 16px",
+  padding: "10px 10px 10px 10px",
   borderRadius: "10px",
   border: "none",
   background: "#e2e8f0",

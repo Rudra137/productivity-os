@@ -8,10 +8,10 @@ import {
   Legend
 } from "recharts";
 
-function WeeklyChart({ chartData }) {
+function WeeklyChart({ chartData, darkMode }) {
   return (
     <div style={{
-  background: "#ffffff",
+  background: darkMode ? "#1e293b" : "#ffffff",
   padding: "20px",
   borderRadius: "16px",
   boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
@@ -22,15 +22,15 @@ function WeeklyChart({ chartData }) {
     fontSize: "20px",
     fontWeight: "600",
     marginBottom: "15px",
-    color: "#334155"
+    color: darkMode ? "#f8fafc" : "#334155"
   }}
 >
   📈 Weekly Trend
 </h3>
 
       <AreaChart
-        width={700}
-        height={350}
+        width={500}
+        height={300}
         data={chartData}
         margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
       >

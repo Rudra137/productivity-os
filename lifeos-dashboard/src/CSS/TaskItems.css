@@ -1,0 +1,19 @@
+.task-btn {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  margin-right: 8px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  background-color: #e2e8f0;
+  transition: 0.2s;
+}
+
+.task-btn:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}
+

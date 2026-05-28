@@ -14,7 +14,7 @@ function TaskInput({
       border: "1px solid #ccc",
       borderRadius: "10px"
     }}>
-      <h3 style={{ marginBottom: "10px" }}>Add Task</h3>
+      <h3 style={{ marginBottom: "10px" }}>Add New Task</h3>
 
       <input
         type="text"
@@ -30,7 +30,8 @@ function TaskInput({
         }}
       />
 
-      <div>
+      <div 
+      >
         {/* CATEGORY */}
         <select
           value={category}

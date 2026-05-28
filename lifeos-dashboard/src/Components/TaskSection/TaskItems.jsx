@@ -1,4 +1,5 @@
 import React from "react";
+import TaskItem from "./TaskItems";
 
 
 function TaskItems({
@@ -64,7 +65,7 @@ const doneStyle = {
             onChange={(e) => setEditText(e.target.value)}
           />
 
-          <button
+          <button 
             onClick={() => {
               handleEdit(task.id, editText);
               setEditId(null);
@@ -79,42 +80,94 @@ const doneStyle = {
           </button>
         </div>
       ) : (
-        <div>
-          <span
-            style={{
-              textDecoration: task.completed ? "line-through" : "none"
-            }}
-          >
-            {task.text}
-          </span>
+<div>
+  {/* TOP ROW */}
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: "12px"
+    }}
+  >
+    <span
+      style={{
+        textDecoration: task.completed
+          ? "line-through"
+          : "none",
+        fontSize: "16px",
+        fontWeight: "600",
+        color: "#1e293b"
+      }}
+    >
+      {task.text}
+    </span>
 
-          <div style={{ fontSize: "12px" }}>
-            📂 {task.category} ⚡ {task.priority}
-          </div>
-<button
-  style={deleteStyle}
-  onClick={() => handleDelete(task.id)}
->
-  Delete
-</button>
+    <span
+      style={{
+        fontSize: "12px",
+        padding: "6px 10px",
+        borderRadius: "999px",
+        background:
+          task.priority === "High"
+            ? "#fee2e2"
+            : task.priority === "Medium"
+            ? "#fef3c7"
+            : "#dcfce7",
+        color:
+          task.priority === "High"
+            ? "#dc2626"
+            : task.priority === "Medium"
+            ? "#d97706"
+            : "#16a34a"
+      }}
+    >
+      ⚡ {task.priority}
+    </span>
+  </div>
 
-<button
-  style={editStyle}
-  onClick={() => {
-    setEditId(task.id);
-    setEditText(task.text);
-  }}
->
-  Edit
-</button>
+  {/* CATEGORY */}
+  <div
+    style={{
+      fontSize: "13px",
+      color: "#64748b",
+      marginBottom: "12px",
+      padding: "6px 10px"
+    }}
+  >
+    📂 {task.category}
+  </div>
 
-<button
-  style={doneStyle}
-  onClick={() => toggleComplete(task.id)}
->
-  {task.completed ? "Undo" : "Done"}
-</button>
-        </div>
+  {/* BUTTON ROW */}
+  <div>
+    <button
+      className="task-btn"
+      style={deleteStyle}
+      onClick={() => handleDelete(task.id)}
+    >
+      Delete
+    </button>
+
+    <button
+      className="task-btn"
+      style={editStyle}
+      onClick={() => {
+        setEditId(task.id);
+        setEditText(task.text);
+      }}
+    >
+      Edit
+    </button>
+
+    <button
+      className="task-btn"
+      style={doneStyle}
+      onClick={() => toggleComplete(task.id)}
+    >
+      {task.completed ? "Undo" : "Done"}
+    </button>
+  </div>
+</div>
       )}
     </li>
   );

@@ -17,6 +17,7 @@ import TaskItem from "./Components/TaskSection/TaskItems";
 
 
 
+
 //Functional component for the main app and UseStates.
 function App() {
 //STATE VARIABLES  
@@ -26,6 +27,7 @@ function App() {
   const [category, setCategory] = useState("General");
   const [priority, setPriority] = useState("Medium");
   const [filter, setFilter] = useState("All");
+  const [darkMode, setDarkMode] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [tasks, setTasks] = useState(() => {
   const saved = localStorage.getItem("tasks");
@@ -103,16 +105,51 @@ const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
   setTask("");
 };
 
+const handleDelete = (id) => {
+  setTasks((prev) =>
+    prev.filter((task) => task.id !== id)
+  );
+};
+
+const handleEdit = (id, newText) => {
+  setTasks((prev) =>
+    prev.map((task) =>
+      task.id === id
+        ? { ...task, text: newText }
+        : task
+    )
+  );
+};
+
+const toggleComplete = (id) => {
+  setTasks((prev) =>
+    prev.map((task) =>
+      task.id === id
+        ? { ...task, completed: !task.completed }
+        : task
+    )
+  );
+};
 
 const handleDragEnd = (result) => {
   if (!result.destination) return;
 
   const items = Array.from(filteredTasks);
-  const [movedItem] = items.splice(result.source.index, 1);
-  items.splice(result.destination.index, 0, movedItem);
+
+  const [movedItem] = items.splice(
+    result.source.index,
+    1
+  );
+
+  items.splice(
+    result.destination.index,
+    0,
+    movedItem
+  );
 
   setTasks(items);
 };
+
 
 // 🧠 EFFECTS
   // Functions for handling task input and list management
@@ -163,149 +200,202 @@ console.log("TASKS:", tasks);
     
   <div
   style={{
+    transition: "all 0.3s ease",
     padding: "30px",
-    maxWidth: "1400px",
+    width: "100%",
+    minHeight: "100vh",
     margin: "auto",
     fontFamily: "sans-serif",
-    minHeight: "100vh",
-    background: "#f4f7fb"
+    background: darkMode ? "#0f172a" : "#f4f7fb",
   }}
 >
-          <h1
+   <h1
   style={{
     fontSize: "36px",
     fontWeight: "700",
     marginBottom: "30px",
-    color: "#1e293b"
+    color: darkMode ? "#f8fafc" : "#1e293b",
   }}
 >
   LifeOS Dashboard
 </h1>
+<button
+  onClick={() => setDarkMode(!darkMode)}
+  style={{
+    marginBottom: "20px",
+    padding: "10px 16px",
+    borderRadius: "10px",
+    border: "none",
+    cursor: "pointer",
+    background: darkMode ? "#f8fafc" : "#1e293b",
+    color: darkMode ? "#1e293b" : "#f8fafc",
+    fontWeight: "600"
+  }}
+>
+  {darkMode ? "☀️ Light Mode" : "🌙 Dark Mode"}
+</button>
+
 
 
 {/* 🟦 WEEKLY TREND SECTION */}
 <div
-  style={{
-    display: "flex",
+    style={{
+    display: "grid",
+    gridTemplateColumns: "2fr 1fr",
     gap: "20px",
-    marginBottom: "20px",
-    backgroundColor: "#e0f2fe"
+    marginBottom: "20px"
   }}
 >
-  <WeeklyChart chartData={chartData} />
-  <RadarChartBox radarData={radarData} />
-</div>
-    {/* 🟦 WEEKLY FOCUS SECTION */}
-  <div style={{
-  marginBottom: "20px",
-  padding: "15px",
-  borderRadius: "12px",
-  background: "#f8f9fa"
-}}>
-  <h3 style={{
-    fontSize: "20px",
-    fontWeight: "600",
-    marginBottom: "15px",
-    color: "#334155"
-  }}>📊 Weekly Focus</h3>
+  <WeeklyChart
+    chartData={chartData}
+    darkMode={darkMode}
+  />
 
-  {["Health", "Work", "Study"].map((cat) => (
-    <div key={cat} style={{ marginBottom: "10px" }}>
-      <div style={{ fontSize: "14px", marginBottom: "3px" }}>
-        {cat} ({weeklyData[cat]})
-      </div>
-
-      <div style={{
-        height: "15px",
-        background: "#ddd",
-        borderRadius: "10px",
-        overflow: "hidden"
-      }}>
-        <div style={{
-          width: `${(weeklyData[cat] / maxValue) * 100}%`,
-          height: "100%",
-          background:
-            cat === "Health"
-              ? "#4CAF50"
-              : cat === "Work"
-              ? "#2196F3"
-              : "#FF9800",
-          transition: "0.3s"
-        }} />
-      </div>
-    </div>
-  ))}
+  <RadarChartBox
+    radarData={radarData}
+    darkMode={darkMode}
+  />
 </div>
 
-  {/* 🟩 TASK LIST SECTION */}
-<div style={{
-  padding: "15px",
-  border: "1px solid #ccc",
-  borderRadius: "10px",
-}}>
+{/* Task Display Block */}
+{/* LOWER DASHBOARD SECTION */}
+<div
+  style={{
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr 1fr",
+    gap: "20px",
+    marginTop: "20px"
+  }}
+>
 
-  <h3 style={{ marginBottom: "10px" }}>Your Tasks</h3>
- <TaskInput
-  task={task}
-  setTask={setTask}
-  category={category}
-  setCategory={setCategory}
-  priority={priority}
-  setPriority={setPriority}
-  addTask={addTask}
-/>
-  {/* ✅ FILTERS OUTSIDE UL */}
-  <TaskFilters
-  filter={filter}
-  setFilter={setFilter}
-  categoryFilter={categoryFilter}
-  setCategoryFilter={setCategoryFilter}
-/>
+  {/* WEEKLY FOCUS CARD */}
+  <div
+    style={{
+      padding: "20px",
+      borderRadius: "16px",
+      background: darkMode ? "#1e293b" : "#ffffff",
+      boxShadow: "0 4px 10px rgba(0,0,0,0.08)"
+    }}
+  >
+    <h3>📊 Weekly Focus</h3>
 
-  {/* DRAG AND DROP CONTEXT */}
-  <DragDropContext onDragEnd={handleDragEnd}>
-    <Droppable droppableId="tasks">
-      {(provided) => (
-        <ul
-          {...provided.droppableProps}
-          ref={provided.innerRef}
-          style={{ listStyle: "none", padding: 0 }}
+    {["Health", "Work", "Study"].map((cat) => (
+      <div key={cat} style={{ marginBottom: "10px" }}>
+        <div style={{ fontSize: "14px", marginBottom: "3px" }}>
+          {cat} ({weeklyData[cat]})
+        </div>
+
+        <div
+          style={{
+            height: "15px",
+            background: darkMode ? "#334155" : "#ddd",
+            borderRadius: "10px",
+            overflow: "hidden"
+          }}
         >
-          {filteredTasks.map((task, index) => (
-          <Draggable
-            key={task.id}
-            draggableId={task.id.toString()}
-            index={index}
+          <div
+            style={{
+              width: `${(weeklyData[cat] / maxValue) * 100}%`,
+              height: "100%",
+              background:
+                cat === "Health"
+                  ? "#4CAF50"
+                  : cat === "Work"
+                  ? "#2196F3"
+                  : "#FF9800"
+            }}
+          />
+        </div>
+      </div>
+    ))}
+  </div>
+
+  {/* ADD TASK CARD */}
+  <div
+    style={{
+      padding: "20px",
+      borderRadius: "16px",
+      background: darkMode ? "#1e293b" : "#ffffff",
+      boxShadow: "0 4px 10px rgba(0,0,0,0.08)"
+    }}
+  >
+    <h3>Add Task</h3>
+
+    <TaskInput
+      task={task}
+      setTask={setTask}
+      category={category}
+      setCategory={setCategory}
+      priority={priority}
+      setPriority={setPriority}
+      addTask={addTask}
+    />
+  </div>
+
+  {/* TASK LIST CARD */}
+  <div
+    style={{
+      padding: "20px",
+      borderRadius: "16px",
+      background: darkMode ? "#1e293b" : "#ffffff",
+      boxShadow: "0 4px 10px rgba(0,0,0,0.08)"
+    }}
+  >
+    <h3>Your Tasks</h3>
+
+    <TaskFilters
+      filter={filter}
+      setFilter={setFilter}
+      categoryFilter={categoryFilter}
+      setCategoryFilter={setCategoryFilter}
+    />
+
+    <DragDropContext onDragEnd={handleDragEnd}>
+      <Droppable droppableId="tasks">
+        {(provided) => (
+          <ul
+            {...provided.droppableProps}
+            ref={provided.innerRef}
+            style={{
+              listStyle: "none",
+              padding: 0
+            }}
           >
-            {(provided) => (
-              <TaskItem
-                task={task}
+            {filteredTasks.map((task, index) => (
+              <Draggable
+                key={task.id}
+                draggableId={task.id.toString()}
                 index={index}
-                editId={editId}
-                editText={editText}
-                setEditId={setEditId}
-                setEditText={setEditText}
-                handleEdit={handleEdit}
-                handleDelete={handleDelete}
-                toggleComplete={toggleComplete}
-                provided={provided}
-              />
-            )}
-          </Draggable>
-        ))}
-        
+              >
+                {(provided) => (
+                  <TaskItem
+                    task={task}
+                    index={index}
+                    editId={editId}
+                    editText={editText}
+                    setEditId={setEditId}
+                    setEditText={setEditText}
+                    handleEdit={handleEdit}
+                    handleDelete={handleDelete}
+                    toggleComplete={toggleComplete}
+                    provided={provided}
+                  />
+                )}
+              </Draggable>
+            ))}
 
-          {provided.placeholder}
-
-        </ul>
-      )}
-    </Droppable>
-  </DragDropContext>
-
+            {provided.placeholder}
+          </ul>
+        )}
+      </Droppable>
+    </DragDropContext>
+  </div>
 </div>
 </div>
 );
-};
+}
+
+
 
 
 export default App;
