@@ -14,7 +14,9 @@ import WeeklyChart from "./Components/WeeklyChart";
 import { getWeeklyChartData, getLifeRadarData, getTaskScore } from "./Utils/chartHelpers";
 import RadarChartBox from "./Components/RadarChartBox";
 import TaskItem from "./Components/TaskSection/TaskItems";
-
+import StatsCard from "./Components/Dashboard/StatsCard";
+import StatsSection from "./Components/Dashboard/StatsSection";
+import DashboardHeader from "./Components/Dashboard/DashboardHeader";
 
 
 
@@ -209,6 +211,12 @@ console.log("TASKS:", tasks);
     background: darkMode ? "#0f172a" : "#f4f7fb",
   }}
 >
+  <DashboardHeader
+   darkMode={darkMode}
+   userName="Debojyoti"
+   currentDate={new Date()}
+  />
+
    <h1
   style={{
     fontSize: "36px",
@@ -236,7 +244,7 @@ console.log("TASKS:", tasks);
 </button>
 
 
-
+{/* 🟦 UPPER DASHBOARD SECTION */}
 {/* 🟦 WEEKLY TREND SECTION */}
 <div
     style={{
@@ -257,7 +265,7 @@ console.log("TASKS:", tasks);
   />
 </div>
 
-{/* Task Display Block */}
+
 {/* LOWER DASHBOARD SECTION */}
 <div
   style={{
@@ -267,70 +275,6 @@ console.log("TASKS:", tasks);
     marginTop: "20px"
   }}
 >
-
-  {/* WEEKLY FOCUS CARD */}
-  <div
-    style={{
-      padding: "20px",
-      borderRadius: "16px",
-      background: darkMode ? "#1e293b" : "#ffffff",
-      boxShadow: "0 4px 10px rgba(0,0,0,0.08)"
-    }}
-  >
-    <h3>📊 Weekly Focus</h3>
-
-    {["Health", "Work", "Study"].map((cat) => (
-      <div key={cat} style={{ marginBottom: "10px" }}>
-        <div style={{ fontSize: "14px", marginBottom: "3px" }}>
-          {cat} ({weeklyData[cat]})
-        </div>
-
-        <div
-          style={{
-            height: "15px",
-            background: darkMode ? "#334155" : "#ddd",
-            borderRadius: "10px",
-            overflow: "hidden"
-          }}
-        >
-          <div
-            style={{
-              width: `${(weeklyData[cat] / maxValue) * 100}%`,
-              height: "100%",
-              background:
-                cat === "Health"
-                  ? "#4CAF50"
-                  : cat === "Work"
-                  ? "#2196F3"
-                  : "#FF9800"
-            }}
-          />
-        </div>
-      </div>
-    ))}
-  </div>
-
-  {/* ADD TASK CARD */}
-  <div
-    style={{
-      padding: "20px",
-      borderRadius: "16px",
-      background: darkMode ? "#1e293b" : "#ffffff",
-      boxShadow: "0 4px 10px rgba(0,0,0,0.08)"
-    }}
-  >
-    <h3>Add Task</h3>
-
-    <TaskInput
-      task={task}
-      setTask={setTask}
-      category={category}
-      setCategory={setCategory}
-      priority={priority}
-      setPriority={setPriority}
-      addTask={addTask}
-    />
-  </div>
 
   {/* TASK LIST CARD */}
   <div
@@ -390,6 +334,41 @@ console.log("TASKS:", tasks);
       </Droppable>
     </DragDropContext>
   </div>
+
+  {/* STATS CARDS */}
+  <div>
+    <StatsSection
+      total={totalTasks}
+      completed={completedTasks}
+      pending={pendingTasks}
+      streak={streak}
+      darkMode={darkMode}
+    />
+  </div>
+
+  {/* ADD TASK CARD */}
+  <div
+    style={{
+      padding: "20px",
+      borderRadius: "16px",
+      background: darkMode ? "#1e293b" : "#ffffff",
+      boxShadow: "0 4px 10px rgba(0,0,0,0.08)"
+    }}
+  >
+    <h3>Add Task</h3>
+
+    <TaskInput
+      task={task}
+      setTask={setTask}
+      category={category}
+      setCategory={setCategory}
+      priority={priority}
+      setPriority={setPriority}
+      addTask={addTask}
+    />
+  </div>
+
+
 </div>
 </div>
 );
