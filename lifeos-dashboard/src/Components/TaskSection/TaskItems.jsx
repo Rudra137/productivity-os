@@ -1,5 +1,5 @@
 import React from "react";
-import TaskItem from "./TaskItems";
+//import TaskItem from "./TaskItems";
 
 
 function TaskItems({
@@ -16,15 +16,17 @@ function TaskItems({
 }) {
   const isEditing = editId === task.id;
 
-  const actionButton = {
-  padding: "8px 12px",
+const actionButton = {
+  padding: "4px",
   border: "none",
   borderRadius: "8px",
   cursor: "pointer",
-  fontSize: "13px",
-  fontWeight: "500",
-  marginRight: "8px",
-  marginTop: "10px"
+  fontSize: "18px",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  transition: "background 0.2s"
+
 };
 
 const deleteStyle = {
@@ -44,20 +46,57 @@ const doneStyle = {
   background: task.completed ? "#e2e8f0" : "#dcfce7",
   color: task.completed ? "#475569" : "#16a34a"
 };
+const priorityColor =
+  task.priority === "High"
+    ? "#ffb5b5"
+    : task.priority === "Medium"
+    ? "#ffd285"
+    : task.priority === "Low"
+    ? "#9effc2"
+    : "#a8e5ff"; // General
+
+const priorityStyles = {
+  High: {
+    background: "#fef2f2",
+    borderLeft: "5px solid #ef4444"
+  },
+
+  Medium: {
+    background: "#fffbeb",
+    borderLeft: "5px solid #f59e0b"
+  },
+
+  Low: {
+    background: "#f0fdf4",
+    borderLeft: "5px solid #22c55e"
+  },
+
+  General: {
+    background: "#f0f9ff",
+    borderLeft: "5px solid #38bdf8"
+  }
+};
+
+const currentPriorityStyle =
+  priorityStyles[task.priority] ||
+  priorityStyles.General;
+
   return (
-    <li
-      ref={provided.innerRef}
-      {...provided.draggableProps}
-      {...provided.dragHandleProps}
-      style={{
-        marginBottom: "10px",
-        padding: "12px",
-        borderRadius: "10px",
-        background: "white",
-        boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-        ...provided.draggableProps.style
-      }}
-    >
+<li
+  ref={provided.innerRef}
+  {...provided.draggableProps}
+  {...provided.dragHandleProps}
+ style={{
+  marginBottom: "10px",
+  padding: "14px",
+  borderRadius: "12px",
+  boxShadow: "0 2px 6px rgba(0,0,0,0.08)",
+
+  ...currentPriorityStyle,
+
+  ...provided.draggableProps.style
+}}
+>
       {isEditing ? (
         <div>
           <input
@@ -81,91 +120,56 @@ const doneStyle = {
         </div>
       ) : (
 <div>
-  {/* TOP ROW */}
+  {/* Row 1 */}
+  <div
+    style={{
+      fontSize: "16px",
+      fontWeight: "600",
+      marginBottom: "8px",
+      textDecoration: task.completed
+        ? "line-through"
+        : "none"
+    }}
+  >
+    {task.text}
+  </div>
+
+  {/* Row 2 */}
   <div
     style={{
       display: "flex",
       justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: "12px"
+      alignItems: "center"
     }}
   >
     <span
       style={{
-        textDecoration: task.completed
-          ? "line-through"
-          : "none",
-        fontSize: "16px",
-        fontWeight: "600",
-        color: "#1e293b"
+        fontSize: "13px",
+        color: "#64748b"
       }}
     >
-      {task.text}
+      📂 {task.category}
     </span>
 
-    <span
+    <div
       style={{
-        fontSize: "12px",
-        padding: "6px 10px",
-        borderRadius: "999px",
-        background:
-          task.priority === "High"
-            ? "#fee2e2"
-            : task.priority === "Medium"
-            ? "#fef3c7"
-            : "#dcfce7",
-        color:
-          task.priority === "High"
-            ? "#dc2626"
-            : task.priority === "Medium"
-            ? "#d97706"
-            : "#16a34a"
+        display: "flex",
+        gap: "8px"
       }}
     >
-      ⚡ {task.priority}
-    </span>
-  </div>
+      <button
+        style={editStyle} onClick={() => {setEditId(task.id); setEditText(task.text);}}>
+          ✏️
+      </button>
 
-  {/* CATEGORY */}
-  <div
-    style={{
-      fontSize: "13px",
-      color: "#64748b",
-      marginBottom: "12px",
-      padding: "6px 10px"
-    }}
-  >
-    📂 {task.category}
-  </div>
+      <button style={doneStyle} onClick={() => toggleComplete(task.id)}>
+        {task.completed ? "↩️" : "✔️"}
+      </button>
 
-  {/* BUTTON ROW */}
-  <div>
-    <button
-      className="task-btn"
-      style={deleteStyle}
-      onClick={() => handleDelete(task.id)}
-    >
-      Delete
-    </button>
-
-    <button
-      className="task-btn"
-      style={editStyle}
-      onClick={() => {
-        setEditId(task.id);
-        setEditText(task.text);
-      }}
-    >
-      Edit
-    </button>
-
-    <button
-      className="task-btn"
-      style={doneStyle}
-      onClick={() => toggleComplete(task.id)}
-    >
-      {task.completed ? "Undo" : "Done"}
-    </button>
+      <button style={deleteStyle} onClick={() => handleDelete(task.id)}>
+        🗑
+      </button>
+    </div>
   </div>
 </div>
       )}
