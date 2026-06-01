@@ -1,4 +1,5 @@
-import React from "react";
+
+import React, { useState } from "react";
 //import TaskItem from "./TaskItems";
 
 
@@ -14,19 +15,24 @@ function TaskItems({
   toggleComplete,
   provided
 }) {
-  const isEditing = editId === task.id;
+const isEditing = editId === task.id;
 
 const actionButton = {
-  padding: "4px",
+  width: "32px",
+  height: "32px",
+
   border: "none",
   borderRadius: "8px",
+
   cursor: "pointer",
-  fontSize: "18px",
+
+  fontSize: "16px",
+
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  transition: "background 0.2s"
 
+  transition: "all 0.2s ease"
 };
 
 const deleteStyle = {
@@ -46,7 +52,10 @@ const doneStyle = {
   background: task.completed ? "#e2e8f0" : "#dcfce7",
   color: task.completed ? "#475569" : "#16a34a"
 };
-const priorityColor =
+
+const [showDetails, setShowDetails] = useState(false);
+
+const priorityColor = 
   task.priority === "High"
     ? "#ffb5b5"
     : task.priority === "Medium"
@@ -121,18 +130,67 @@ const currentPriorityStyle =
       ) : (
 <div>
   {/* Row 1 */}
-  <div
+<div
+  style={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "8px"
+  }}
+>
+  <span
     style={{
       fontSize: "16px",
       fontWeight: "600",
-      marginBottom: "8px",
       textDecoration: task.completed
         ? "line-through"
         : "none"
     }}
   >
     {task.text}
+  </span>
+
+  <button
+    onClick={() => setShowDetails(!showDetails)}
+    style={{
+      border: "none",
+      background: "transparent",
+      cursor: "pointer",
+      fontSize: "18px"
+    }}
+  >
+    ℹ️
+  </button>
+</div>
+{showDetails && (
+  <div
+    style={{
+      background: "rgba(255,255,255,0.5)",
+      padding: "10px",
+      borderRadius: "8px",
+      marginBottom: "10px",
+      fontSize: "13px"
+    }}
+  >
+    <div style={{ marginBottom: "6px" }}>
+      <strong>Description:</strong>
+      <br />
+      {task.description || "No description"}
+    </div>
+
+    <div style={{ marginBottom: "6px" }}>
+      <strong>Duration:</strong>
+      {" "}
+      {task.durationMinutes || 0} min
+    </div>
+
+    <div>
+      <strong>Date:</strong>
+      {" "}
+      {task.date || "Not set"}
+    </div>
   </div>
+)}
 
   {/* Row 2 */}
   <div

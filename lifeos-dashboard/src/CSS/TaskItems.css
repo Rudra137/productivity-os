@@ -17,3 +17,7 @@
   opacity: 0.9;
 }
 
+.task-btn:hover {
+  transform: scale(1.08);
+}
+
