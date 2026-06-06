@@ -3,23 +3,25 @@ function StatsCard({ title, value, darkMode }) {
     <div
       style={{
         padding: "2px",
-        borderRadius: "2px",
+        borderRadius: "20px",
         background: darkMode ? "#1e293b" : "#ffffff",
-        boxShadow: "0 4px 10px rgba(0,0,0,0.08)"
+        boxShadow: "0 4px 5px rgba(0,0,0,0.08)"
       }}
     >
-      <h4
+      <h3
         style={{
-          marginBottom: "6px",
-          color: darkMode ? "#cbd5e1" : "#475569"
+          marginBottom: "1px",
+          fontSize: "13px",
+          marginTop: "1px",
+          color: darkMode ? "#f8fcc4" : "#29174e"
         }}
       >
         {title}
-      </h4>
+      </h3>
 
       <h2
         style={{
-          fontSize: "12px",
+          fontSize: "15px",
           color: darkMode ? "#f8fafc" : "#0f172a"
         }}
       >

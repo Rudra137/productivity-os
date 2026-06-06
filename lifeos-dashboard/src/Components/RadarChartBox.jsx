@@ -16,7 +16,10 @@ function RadarChartBox({ radarData, darkMode }) {
   padding: "20px",
   borderRadius: "16px",
   boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-  flex: 1
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center"
       }}
     >
       <h3 

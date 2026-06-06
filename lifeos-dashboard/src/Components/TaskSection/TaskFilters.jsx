@@ -2,7 +2,7 @@ import React from "react";
 
 function TaskFilters({ filter, setFilter, categoryFilter, setCategoryFilter }) {
   return (
-    <div style={{ marginBottom: "15px" }}>
+    <div className="filter-row" style={{ marginBottom: "15px" }}>
       
       {/* ✅ STATUS FILTERS */}
       <div style={{ marginBottom: "10px" }}>
@@ -27,10 +27,12 @@ function TaskFilters({ filter, setFilter, categoryFilter, setCategoryFilter }) {
           Pending
         </button>
       </div>
+      
+
 
       {/* 📂 CATEGORY FILTERS */}
-      <div>
-        <span style={{ marginRight: "8px" }}>Category:</span>
+      <div className="category-row">
+        <span style={{ marginRight: "8px" }}></span>
 
         {["All", "Work", "Study", "Health", "General"].map((cat) => (
           <button

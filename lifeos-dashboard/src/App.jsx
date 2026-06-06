@@ -237,7 +237,8 @@ const addTask = (newTaskData) => {
             padding: "20px",
             borderRadius: "16px",
             background: darkMode ? "#1e293b" : "#ffffff",
-            boxShadow: "0 4px 10px rgba(0,0,0,0.08)"
+            boxShadow: "0 4px 10px rgba(0,0,0,0.08)",
+            marginBottom: "10px"
           }}
         >
           <h3
@@ -267,7 +268,7 @@ const addTask = (newTaskData) => {
     }}
   />
 </div>
-
+          
           <TaskFilters
             filter={filter}
             setFilter={setFilter}
