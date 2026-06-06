@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from "recharts";
 import TaskFilters from "./Components/TaskSection/TaskFilters";
 import TaskInput from "./Components/TaskSection/TaskInput";
 import WeeklyChart from "./Components/WeeklyChart";
@@ -12,14 +11,22 @@ import StatsSection from "./Components/Dashboard/StatsSection";
 import DashboardHeader from "./Components/Dashboard/DashboardHeader";
 import DashboardFooter from "./Components/Dashboard/DashboardFooter";
 
+import "./App.css"; 
+
 function App() {
   // STATE VARIABLES  
   const [editId, setEditId] = useState(null);
   const [editText, setEditText] = useState("");
   const [filter, setFilter] = useState("All");
-  const [darkMode, setDarkMode] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [tasks, setTasks] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const [darkMode, setDarkMode] = useState(() => {
+  const savedTheme = localStorage.getItem("darkMode");
+  return savedTheme ? JSON.parse(savedTheme) : false;
+});
+
   
   const [streak, setStreak] = useState(() => {
     const saved = localStorage.getItem("streak");
@@ -42,7 +49,13 @@ function App() {
     if (filter === "Completed" && !task.completed) return false;
     if (filter === "Pending" && task.completed) return false;
     if (categoryFilter !== "All" && task.category !== categoryFilter) return false;
-    return true;
+   if (
+  searchTerm && !(task.text?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    task.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    task.category?.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+)
+  return false; return true;
   });
 
   const chartData = getWeeklyChartData(tasks);
@@ -165,31 +178,27 @@ const addTask = (newTaskData) => {
     }
   }, [tasks]); 
 
+  useEffect(() => {
+  localStorage.setItem(
+    "darkMode",
+    JSON.stringify(darkMode)
+  );
+}, [darkMode]);
+
   return (
-    <div
-      style={{
-        transition: "all 0.3s ease",
-        padding: "30px",
-        width: "100%",
-        minHeight: "100vh",
-        margin: "auto",
-        fontFamily: "sans-serif",
-        background: darkMode ? "#0f172a" : "#f4f7fb",
-      }}
-    >
-      <DashboardHeader
+    <div className="page-container" style={{ background: darkMode ? "#0f172a" : "#f8fafc" }}>
+      <DashboardHeader className="dashboard-header"
         darkMode={darkMode}
         userName="Debojyoti"
         currentDate={new Date()}
       />
 
-      <h1
+      <h1 className ="dashboard-title"
         style={{
-          fontSize: "36px",
-          fontWeight: "700",
-          marginBottom: "30px",
-          color: darkMode ? "#f8fafc" : "#1e293b",
-        }}
+          textAlign: "center",
+          marginBottom: "20px",
+          color: darkMode ? "#f8fafc" : "#1e293b"
+        }}  
       >
         LifeOS Dashboard
       </h1>
@@ -197,6 +206,9 @@ const addTask = (newTaskData) => {
       <button
         onClick={() => setDarkMode(!darkMode)}
         style={{
+          maxWidth: "160px",
+          alignSelf: "center",
+          justifySelf: "center",
           marginBottom: "20px",
           padding: "10px 16px",
           borderRadius: "10px",
@@ -211,27 +223,14 @@ const addTask = (newTaskData) => {
       </button>
 
       {/* UPPER DASHBOARD SECTION */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "2fr 1fr",
-          gap: "20px",
-          marginBottom: "20px"
-        }}
-      >
-        <WeeklyChart chartData={chartData} darkMode={darkMode} />
-        <RadarChartBox radarData={radarData} darkMode={darkMode} />
+      <div className="upper-dashboard">
+          <WeeklyChart chartData={chartData} darkMode={darkMode} />
+          <RadarChartBox radarData={radarData} darkMode={darkMode} />
       </div>
 
       {/* LOWER DASHBOARD SECTION */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr 1fr",
-          gap: "10px",
-          marginTop: "10px"
-        }}
-      >
+      <div className="lower-dashboard">
+
         {/* TASK LIST CARD */}
         <div
           style={{
@@ -241,7 +240,33 @@ const addTask = (newTaskData) => {
             boxShadow: "0 4px 10px rgba(0,0,0,0.08)"
           }}
         >
-          <h3>Your Tasks</h3>
+          <h3
+            style={{
+              marginBottom: "15px",
+              color: darkMode ? "#f8fafc" : "#475569"
+            }}
+          >Your Tasks</h3>
+        
+        <div
+  style={{
+    marginBottom: "15px"
+  }}
+>
+  {/* Search Bar */}
+  <input
+    type="text"
+    placeholder="Search tasks..."
+    value={searchTerm}
+    onChange={(e) => setSearchTerm(e.target.value)}
+    style={{
+      width: "95%",
+      padding: "10px",
+      borderRadius: "10px",
+      border: "1px solid #cbd5e1",
+      fontSize: "14px"
+    }}
+  />
+</div>
 
           <TaskFilters
             filter={filter}

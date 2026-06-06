@@ -1,5 +1,13 @@
 
 import React, { useState } from "react";
+import {
+  FaEdit,
+  FaTrash,
+  FaCheck,
+  FaUndo,
+  FaInfoCircle,
+  FaFolder
+} from "react-icons/fa";
 //import TaskItem from "./TaskItems";
 
 
@@ -159,9 +167,11 @@ const currentPriorityStyle =
       fontSize: "18px"
     }}
   >
-    ℹ️
+    <FaInfoCircle color="#64748b" />
   </button>
 </div>
+
+{/* Details Section */}
 {showDetails && (
   <div
     style={{
@@ -206,7 +216,7 @@ const currentPriorityStyle =
         color: "#64748b"
       }}
     >
-      📂 {task.category}
+      <FaFolder /> {task.category}
     </span>
 
     <div
@@ -217,15 +227,15 @@ const currentPriorityStyle =
     >
       <button
         style={editStyle} onClick={() => {setEditId(task.id); setEditText(task.text);}}>
-          ✏️
+          <FaEdit />
       </button>
 
       <button style={doneStyle} onClick={() => toggleComplete(task.id)}>
-        {task.completed ? "↩️" : "✔️"}
+        {task.completed ? <FaUndo /> : <FaCheck />}
       </button>
 
       <button style={deleteStyle} onClick={() => handleDelete(task.id)}>
-        🗑
+        <FaTrash />   
       </button>
     </div>
   </div>

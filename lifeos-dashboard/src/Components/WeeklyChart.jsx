@@ -5,7 +5,8 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend
+  Legend,
+  ResponsiveContainer,
 } from "recharts";
 
 function WeeklyChart({ chartData, darkMode }) {
@@ -15,7 +16,7 @@ function WeeklyChart({ chartData, darkMode }) {
   padding: "20px",
   borderRadius: "16px",
   boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-  flex: 1
+  
 }}>
       <h3
   style={{
@@ -27,13 +28,12 @@ function WeeklyChart({ chartData, darkMode }) {
 >
   📈 Weekly Trend
 </h3>
-
-      <AreaChart
-        width={500}
-        height={300}
-        data={chartData}
-        margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
-      >
+    <div style={{ width: "100%", height: "350px" }}>
+      <ResponsiveContainer width="100%" height="100%">
+        <AreaChart
+          data={chartData}
+          margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+        >
         <defs>
           <linearGradient id="colorWork" x1="0" y1="0" x2="0" y2="1">
             <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
@@ -86,6 +86,8 @@ function WeeklyChart({ chartData, darkMode }) {
           strokeWidth={3}
         />
       </AreaChart>
+      </ResponsiveContainer>
+    </div>
     </div>
   );
 }

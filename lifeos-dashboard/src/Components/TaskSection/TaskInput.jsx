@@ -10,6 +10,12 @@ function TaskInput({ addTask }) {
     timeUnit: "hours" // Default to hours
   });
 
+  const [darkMode, setDarkMode] = useState(() => {
+  const savedTheme = localStorage.getItem("darkMode");
+  return savedTheme ? JSON.parse(savedTheme) : false;
+});
+
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setTaskData((prev) => ({
@@ -43,7 +49,7 @@ function TaskInput({ addTask }) {
 
   return (
     <div style={{
-      backgroundColor: "#ffffff",
+      backgroundColor: darkMode ? "#334155" : "#ffffff",
       borderRadius: "12px",
       boxShadow: "0 4px 20px rgba(0, 0, 0, 0.05)",
       width: "100%",
@@ -54,7 +60,7 @@ function TaskInput({ addTask }) {
       fontFamily: "system-ui, -apple-system, sans-serif"
     }}>
       <h3 style={{ 
-        color: "#1e3a5f",
+        color: darkMode ? "#f8fafc" : "#1e3a5f",
         fontSize: "1.35rem",
         fontWeight: "700",
         marginBottom: "20px",
@@ -81,7 +87,8 @@ function TaskInput({ addTask }) {
               border: "1px solid #cbd5e1",
               borderRadius: "6px",
               fontSize: "0.95rem",
-              color: "#334155",
+              color: darkMode ? "#f8fafc" : "#334155",
+              backgroundColor: darkMode ? "#334155" : "#ffffff",  
               boxSizing: "border-box",
               outline: "none"
             }}
@@ -100,8 +107,8 @@ function TaskInput({ addTask }) {
               border: "1px solid #cbd5e1",
               borderRadius: "6px",
               fontSize: "0.95rem",
-              color: "#334155",
-              backgroundColor: "#ffffff",
+              color: darkMode ? "#f8fafc" : "#334155",
+              backgroundColor: darkMode ? "#334155" : "#ffffff",
               boxSizing: "border-box",
               outline: "none"
             }}
@@ -127,7 +134,8 @@ function TaskInput({ addTask }) {
               border: "1px solid #cbd5e1",
               borderRadius: "6px",
               fontSize: "0.95rem",
-              color: "#334155",
+              color: darkMode ? "#f8fafc" : "#334155",
+              backgroundColor: darkMode ? "#334155" : "#ffffff",  
               boxSizing: "border-box",
               outline: "none",
               resize: "vertical"
@@ -144,7 +152,7 @@ function TaskInput({ addTask }) {
           paddingTop: "10px",
           marginTop: "4px"
         }}>
-          <span style={{ color: "#1e3a5f", fontWeight: "600", fontSize: "1rem" }}>
+          <span style={{ color: darkMode ? "#f8fafc" : "#1e3a5f", fontWeight: "600", fontSize: "1rem" }}>
             Priority
           </span>
           <select
@@ -157,8 +165,8 @@ function TaskInput({ addTask }) {
               border: "1px solid #cbd5e1",
               borderRadius: "6px",
               fontSize: "0.95rem",
-              color: "#334155",
-              backgroundColor: "#ffffff",
+              color: darkMode ? "#f8fafc" : "#334155",
+              backgroundColor: darkMode ? "#334155" : "#ffffff",
               outline: "none"
             }}
           >
@@ -176,7 +184,7 @@ function TaskInput({ addTask }) {
           borderTop: "1px solid #e2e8f0",
           paddingTop: "16px"
         }}>
-          <span style={{ color: "#1e3a5f", fontWeight: "600", fontSize: "1rem" }}>
+          <span style={{ color: darkMode ? "#f8fafc" : "#1e3a5f", fontWeight: "600", fontSize: "1rem" }}>
              Estimated Time
           </span>
           <div style={{ display: "flex", gap: "8px", width: "200px" }}>
@@ -195,7 +203,8 @@ function TaskInput({ addTask }) {
                 border: "1px solid #cbd5e1",
                 borderRadius: "6px",
                 fontSize: "0.95rem",
-                color: "#334155",
+                color: darkMode ? "#f8fafc" : "#334155",
+                backgroundColor: darkMode ? "#334155" : "#ffffff",  
                 outline: "none",
                 textAlign: "center"
               }}
@@ -210,8 +219,8 @@ function TaskInput({ addTask }) {
                 border: "1px solid #cbd5e1",
                 borderRadius: "6px",
                 fontSize: "0.95rem",
-                color: "#334155",
-                backgroundColor: "#ffffff",
+                color: darkMode ? "#f8fafc" : "#334155",
+                backgroundColor: darkMode ? "#334155" : "#ffffff",
                 outline: "none"
               }}
             >
@@ -225,7 +234,7 @@ function TaskInput({ addTask }) {
         <button
           type="submit"
           style={{
-            backgroundColor: "#1cb07e",
+            backgroundColor: darkMode ? "#1cb07e" : "#1cb07e",
             color: "#ffffff",
             border: "none",
             borderRadius: "6px",

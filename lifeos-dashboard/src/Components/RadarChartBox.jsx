@@ -4,7 +4,8 @@ import {
   PolarAngleAxis,
   PolarRadiusAxis,
   Radar,
-  Legend
+  Legend,
+  ResponsiveContainer
 } from "recharts";
 
 function RadarChartBox({ radarData, darkMode }) {
@@ -26,28 +27,29 @@ function RadarChartBox({ radarData, darkMode }) {
     color: darkMode ? "#f8fafc" :  "#334155"
   }}>🧭 Life Balance</h3>
 
-      <RadarChart
-        outerRadius={120}
-        width={500}
-        height={420}
-        data={radarData}
-      >
-        <PolarGrid />
-        <PolarAngleAxis dataKey="subject" />
-        <PolarRadiusAxis />
+<div style={{ width: "100%", height: "350px" }}>
+  <ResponsiveContainer width="100%" height="100%">
+    <RadarChart
+      outerRadius={100}
+      data={radarData}
+    >
+      <PolarGrid />
+      <PolarAngleAxis dataKey="subject" />
+      <PolarRadiusAxis />
 
-        <Radar
-          name="Life Balance"
-          dataKey="value"
-          stroke="#3b82f6"
-          fill="#3b82f6"
-          fillOpacity={0.6}
-        />
+      <Radar
+        name="Life Balance"
+        dataKey="value"
+        stroke="#3b82f6"
+        fill="#3b82f6"
+        fillOpacity={0.6}
+      />
 
-        <Legend />
-      </RadarChart>
+      <Legend />
+    </RadarChart>
+  </ResponsiveContainer>
+</div>
     </div>
   );
 }
-
 export default RadarChartBox;

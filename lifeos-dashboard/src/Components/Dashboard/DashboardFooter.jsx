@@ -1,10 +1,13 @@
-function DashboardFooter(darkMode) {
+
+
+function DashboardFooter({ darkMode }) {
   return (
-    <footer darkMode={darkMode}
+    <footer 
       style={{
+        background: darkMode ? "#1e293b" : "#ffffff",
         padding: "20px",
         textAlign: "center",
-        color: "#64748b",
+        color: darkMode ? "#94a3b8" : "#64748b",
         fontSize: "14px",
         borderTop: "1px solid #e2e8f0"
       }}
