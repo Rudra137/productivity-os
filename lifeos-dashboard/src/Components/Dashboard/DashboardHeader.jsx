@@ -1,8 +1,11 @@
+import WeatherWidget from "./WeatherWidget";
+
 function DashboardHeader({ darkMode, userName, currentDate }) {
   return (
     <div className="dashboard-header" style={{display: "flex",
                         justifyContent: "space-between",
                         alignItems: "center"}}> 
+        {/* Left side: Greeting and quote */}
         <div className="header-left" style={{ marginBottom: "20px" }}>  
             <h1 className="greeting" style={{ fontSize: "32px", margin: 0, color: darkMode ? "#f8fafc" : "#0f172a" }}>
                 Welcome back, {userName}!
@@ -11,9 +14,10 @@ function DashboardHeader({ darkMode, userName, currentDate }) {
                 When life gives you lemons, make lemonade.
             </h4>
         </div>
+        {/* Right side: Weather and date/time */}
         <div className="header-right" style={{ marginBottom: "20px", textAlign: "right", padding: "10px" }}>
             <div className="weather" style={{ color: darkMode ? "#cbd5e1" : "#475569", marginBottom: "8px" }}>
-                🌤️ 72°F, Sunny
+                <WeatherWidget />
             </div>
             <div className="date-time" style={{ color: darkMode ? "#cbd5e1" : "#475569" }}>
                 {currentDate.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })} - {currentDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

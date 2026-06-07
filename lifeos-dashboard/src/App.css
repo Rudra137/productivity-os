@@ -214,7 +214,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: var(--text-h);
 
 }
 @media (max-width: 768px) {
