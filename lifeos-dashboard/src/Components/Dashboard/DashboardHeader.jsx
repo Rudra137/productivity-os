@@ -1,6 +1,8 @@
 import WeatherWidget from "./WeatherWidget";
+import { useNavigate } from "react-router-dom";
 
 function DashboardHeader({ darkMode, userName, currentDate }) {
+  const navigate = useNavigate();
   return (
     <div className="dashboard-header" style={{display: "flex",
                         justifyContent: "space-between",
@@ -16,6 +18,8 @@ function DashboardHeader({ darkMode, userName, currentDate }) {
         </div>
         {/* Right side: Weather and date/time */}
         <div className="header-right" style={{ marginBottom: "20px", textAlign: "right", padding: "10px" }}>
+            <button onClick={() => navigate("/")} >Logout</button>
+
             <div className="weather" style={{ color: darkMode ? "#cbd5e1" : "#475569", marginBottom: "8px" }}>
                 <WeatherWidget />
             </div>
