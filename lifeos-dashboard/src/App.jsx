@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./Pages/Login";
 import Register from "./Pages/Register";
 import Dashboard from "./Pages/Dashboard";
+import ProtectedRoute from "./Components/ProtectedRoute";
 
 function App() {
   return (
@@ -19,10 +20,15 @@ function App() {
 
         <Route
           path="/dashboard"
-          element={<Dashboard />}
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
         />
 
       </Routes>
+      
 
     </BrowserRouter>
   );

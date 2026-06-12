@@ -18,7 +18,12 @@ function DashboardHeader({ darkMode, userName, currentDate }) {
         </div>
         {/* Right side: Weather and date/time */}
         <div className="header-right" style={{ marginBottom: "20px", textAlign: "right", padding: "10px" }}>
-            <button onClick={() => navigate("/")} >Logout</button>
+            <button onClick={() => {
+                localStorage.removeItem("isLoggedIn");
+                navigate("/");
+            }} style={{ padding: "8px 16px", backgroundColor: "#ef4444", color: "#fff", border: "none", borderRadius: "4px", marginBottom: "10px" }}>
+                Logout
+            </button>
 
             <div className="weather" style={{ color: darkMode ? "#cbd5e1" : "#475569", marginBottom: "8px" }}>
                 <WeatherWidget />

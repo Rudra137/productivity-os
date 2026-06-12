@@ -84,22 +84,20 @@ const handleRegister = (e) => {
   e.preventDefault();
 
   if (!validateForm()) return;
+
   const user = {
-  name,
-  username,
-  email,
-  password
-};
+    name,
+    username,
+    email,
+    password
+  };
 
-localStorage.setItem(
-  "registeredUser",
-  JSON.stringify(user)
-);
-navigate("/"); 
-console.log("User Saved");
+  localStorage.setItem(
+    "registeredUser",
+    JSON.stringify(user)
+  );
 
-  console.log("Registration Success");
- 
+  navigate("/");
 };
 
     return (

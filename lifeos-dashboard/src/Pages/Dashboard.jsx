@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import TaskFilters from "../Components/TaskSection/TaskFilters";
 import TaskInput from "../Components/TaskSection/TaskInput";
@@ -14,6 +15,7 @@ import "../App.css";
 
 function Dashboard() {
   // STATE VARIABLES  
+  const navigate = useNavigate();
   const [editId, setEditId] = useState(null);
   const [editText, setEditText] = useState("");
   const [filter, setFilter] = useState("All");
@@ -25,6 +27,14 @@ function Dashboard() {
   const savedTheme = localStorage.getItem("darkMode");
   return savedTheme ? JSON.parse(savedTheme) : false;
 });
+
+  const savedUser = JSON.parse(
+  localStorage.getItem("registeredUser")|| {});
+
+  const handleLogout = () => {
+  localStorage.removeItem("isLoggedIn");
+  navigate("/");
+};
 
   
   const [streak, setStreak] = useState(() => {
@@ -184,12 +194,23 @@ const addTask = (newTaskData) => {
   );
 }, [darkMode]);
 
+  useEffect(() => {
+  const isLoggedIn =
+    localStorage.getItem("isLoggedIn");
+
+  if (!isLoggedIn) {
+    navigate("/");
+  }
+}, []);
+
+
   return (
     <div className="page-container" style={{ background: darkMode ? "#0f172a" : "#f8fafc" }}>
       <DashboardHeader className="dashboard-header"
         darkMode={darkMode}
-        userName="Debojyoti"
+        userName={savedUser ? savedUser.name : "User"}
         currentDate={new Date()}
+        onLogout={handleLogout}
       />
 
       <h1 className ="dashboard-title"
@@ -219,7 +240,7 @@ const addTask = (newTaskData) => {
         }}
       >
         {darkMode ? "☀️ Light Mode" : "🌙 Dark Mode"}
-      </button>
+          </button>
 
       {/* UPPER DASHBOARD SECTION */}
       <div className="upper-dashboard">
