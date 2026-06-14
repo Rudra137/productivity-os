@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-
+//import { getUser } from "../Utils/storage";
+import { auth } from "../firebase/firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 function Login() {
 
@@ -9,26 +11,30 @@ const [password, setPassword] = useState("");
 
 const navigate = useNavigate();
 
-const handleLogin = () => {
+const handleLogin = async () => {
 
-  const savedUser =
-    JSON.parse(localStorage.getItem("registeredUser"));
+  try {
+      console.log("Email:", email);
+      console.log("Password:", password);
+      console.log("EMAIL TYPE:", typeof email);
+      console.log("EMAIL VALUE:", JSON.stringify(email));
+      
+    await signInWithEmailAndPassword(
+      auth,
+      email.trim(),
+      password.trim()
+    );
 
-  if (!savedUser) {
-    alert("No account found. Please register first.");
-    return;
-  }
+    navigate("/dashboard");
 
-  if (
-  email === savedUser.email &&
-  password === savedUser.password
-) {
-  localStorage.setItem("isLoggedIn", "true");
+  } catch (error) {
+  console.log(error);
+  console.log(error.code);
+  console.log(error.message);
 
-  navigate("/dashboard");
-} else {
-  alert("Invalid Credentials");
+  alert(error.code);
 }
+
 };
 
   return (
@@ -42,14 +48,14 @@ const handleLogin = () => {
             placeholder="Email" 
             style={{ padding: "8px", marginBottom: "10px", width: "50%", border: "1px solid #ccc",borderRadius: "4px" }} 
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value.trim())}
         />
         <input 
             type="password" 
             placeholder="Password" 
             style={{ padding: "8px", marginBottom: "10px", width: "50%", border: "1px solid #ccc",borderRadius: "4px" }} 
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => setPassword(e.target.value.trim())}
         />
         <button onClick={handleLogin}
         

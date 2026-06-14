@@ -11,6 +11,8 @@ import StatsCard from "../Components/Dashboard/StatsCard";
 import StatsSection from "../Components/Dashboard/StatsSection";
 import DashboardHeader from "../Components/Dashboard/DashboardHeader";
 import DashboardFooter from "../Components/Dashboard/DashboardFooter";
+import { isAuthenticated } from "../Utils/storage";
+import { logoutUser } from "../Utils/storage";
 import "../App.css"; 
 
 function Dashboard() {
@@ -32,7 +34,7 @@ function Dashboard() {
   localStorage.getItem("registeredUser")|| {});
 
   const handleLogout = () => {
-  localStorage.removeItem("isLoggedIn");
+  logoutUser();
   navigate("/");
 };
 
@@ -196,7 +198,7 @@ const addTask = (newTaskData) => {
 
   useEffect(() => {
   const isLoggedIn =
-    localStorage.getItem("isLoggedIn");
+    isAuthenticated("isLoggedIn") === "true";
 
   if (!isLoggedIn) {
     navigate("/");

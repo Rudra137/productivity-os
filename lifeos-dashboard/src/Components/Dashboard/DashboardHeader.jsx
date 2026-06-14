@@ -1,5 +1,7 @@
 import WeatherWidget from "./WeatherWidget";
 import { useNavigate } from "react-router-dom";
+import { signOut } from "firebase/auth";
+import { auth } from "../../firebase/firebase";
 
 function DashboardHeader({ darkMode, userName, currentDate }) {
   const navigate = useNavigate();
@@ -18,11 +20,25 @@ function DashboardHeader({ darkMode, userName, currentDate }) {
         </div>
         {/* Right side: Weather and date/time */}
         <div className="header-right" style={{ marginBottom: "20px", textAlign: "right", padding: "10px" }}>
-            <button onClick={() => {
-                localStorage.removeItem("isLoggedIn");
+            <button
+                onClick={async () => {
+                try {
+                await signOut(auth);
                 navigate("/");
-            }} style={{ padding: "8px 16px", backgroundColor: "#ef4444", color: "#fff", border: "none", borderRadius: "4px", marginBottom: "10px" }}>
-                Logout
+                } catch (error) {
+                console.error(error);
+                }
+            }}
+            style={{
+                padding: "8px 16px",
+                backgroundColor: "#ef4444",
+                color: "#fff",
+                border: "none",
+                borderRadius: "4px",
+                marginBottom: "10px"
+            }}
+            >
+            Logout
             </button>
 
             <div className="weather" style={{ color: darkMode ? "#cbd5e1" : "#475569", marginBottom: "8px" }}>

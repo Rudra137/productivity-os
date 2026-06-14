@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+//import { saveUser } from "../Utils/storage";
+import { auth } from "../firebase/firebase";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 
 
 
@@ -80,24 +84,29 @@ const validateForm = () => {
 };
 
 // Handle form submission
-const handleRegister = (e) => {
+const handleRegister = async (e) => {
   e.preventDefault();
 
   if (!validateForm()) return;
 
-  const user = {
-    name,
-    username,
-    email,
-    password
-  };
+  try {
 
-  localStorage.setItem(
-    "registeredUser",
-    JSON.stringify(user)
-  );
+    await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
 
-  navigate("/");
+    alert("Registration Successful");
+
+    navigate("/");
+
+  } catch (error) {
+
+    console.log(error);
+    alert(error.message);
+
+  }
 };
 
     return (
