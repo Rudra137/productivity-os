@@ -1,206 +1,240 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
-//import { saveUser } from "../Utils/storage";
-import { auth } from "../firebase/firebase";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { getAuth } from "firebase/auth";
-
-
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { auth, db } from "../firebase/firebase";
+import {
+  createUserWithEmailAndPassword,
+  updateProfile,
+  signOut,
+} from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
 
 function Register() {
+  const navigate = useNavigate();
 
+  const [formData, setFormData] = useState({
+    username: "",
+    dob: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
 
-const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
-const [name, setName] = useState("");
-const [username, setUsername] = useState("");
-const [email, setEmail] = useState("");
-const [password, setPassword] = useState("");
-const [confirmPassword, setConfirmPassword] = useState("");
+  const handleChange = (e) => {
+    const { name, value } = e.target;
 
-const [errors, setErrors] = useState({});
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
-// Form validation function
-const validateForm = () => {
-  let newErrors = {};
+  const handleRegister = async (e) => {
+    e.preventDefault();
 
-  // Username
+    const username = formData.username.trim();
+    const dob = formData.dob;
+    const email = formData.email.trim();
+    const password = formData.password;
+    const confirmPassword = formData.confirmPassword;
 
-  const usernameRegex = /^[a-zA-Z0-9_]+$/;
-
-    
-
-    if (!username.trim()) {
-        newErrors.username = "Username is required";
-        }
-        if (!usernameRegex.test(username)) {
-        newErrors.username =
-            "Username can only contain letters, numbers and underscores";
-        }
-        else if (username.length < 3) {
-        newErrors.username =
-            "Username must be at least 3 characters";
-        }
-        else if (username.length > 20) {
-        newErrors.username =
-            "Username must be less than 20 characters";
-        }
-       
-
-  // Email
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!emailRegex.test(email)) {
-     newErrors.email = "Enter a valid email address";
+    if (!username || !dob || !email || !password || !confirmPassword) {
+      alert("Please fill in all fields");
+      return;
     }
 
-  // Password
-  const passwordRegex =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+    if (password !== confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
 
-  if (!passwordRegex.test(password)) {
-    newErrors.password =
-      "Password must contain uppercase, lowercase, number and 8+ chars";
-  }
-  if (password.length < 8) {
-    newErrors.password =
-      "Password must be at least 8 characters";
-  }
-  if(!password.trim()) {
-    newErrors.password = "Password is required";
-  }
-   
+    if (password.length < 6) {
+      alert("Password must be at least 6 characters");
+      return;
+    }
 
-  // Confirm Password
-  if (password !== confirmPassword) {
-    newErrors.confirmPassword =
-      "Passwords do not match";
-  }
+    setLoading(true);
+    setSuccessMessage("");
 
-  setErrors(newErrors);
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
 
-  return Object.keys(newErrors).length === 0;
-};
+      await updateProfile(user, {
+        displayName: username,
+      });
 
-// Handle form submission
-const handleRegister = async (e) => {
-  e.preventDefault();
+      await setDoc(doc(db, "users", user.uid), {
+        uid: user.uid,
+        username,
+        dob,
+        email,
+        createdAt: new Date().toISOString(),
+      });
 
-  if (!validateForm()) return;
+      await signOut(auth);
 
-  try {
+      setLoading(false);
+      setSuccessMessage("Registration successful! Redirecting to login...");
 
-    await createUserWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
+      setTimeout(() => {
+        navigate("/");
+      }, 1500);
+    } catch (error) {
+      console.error("Register error:", error);
+      alert(error.code + " | " + error.message);
+      setLoading(false);
+    }
+  };
 
-    alert("Registration Successful");
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        background: "#f8fafc",
+      }}
+    >
+      <div
+        style={{
+          width: "100%",
+          maxWidth: "380px",
+          background: "#ffffff",
+          padding: "24px",
+          borderRadius: "12px",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+        }}
+      >
+        <h1 style={{ marginBottom: "8px", color: "#1e293b" }}>Register</h1>
+        <p style={{ marginBottom: "20px", color: "#64748b" }}>
+          Create your account to start using LifeOS.
+        </p>
 
-    navigate("/");
-
-  } catch (error) {
-
-    console.log(error);
-    alert(error.message);
-
-  }
-};
-
-    return (
-            <div
-                style={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-                height: "100vh",
-                width: "400px",
-                margin: "0 auto"
+        {successMessage && (
+          <p
+            style={{
+              marginBottom: "16px",
+              padding: "10px",
+              background: "#dcfce7",
+              color: "#166534",
+              borderRadius: "8px",
+              fontSize: "14px",
             }}
-            >
-            <h1 style={{ fontSize: "24px", color: "#475569" }}>Register Page - Coming Soon!</h1>
-            <p style={{ fontSize: "16px", color: "#94a3b8" }}>This is where the registration form will go.</p>
+          >
+            {successMessage}
+          </p>
+        )}
 
-            {/*Full Name Validation*/}
-            <input 
-                type="text" 
-                placeholder="Full Name" 
-                style={{ padding: "8px", marginBottom: "10px", width: "100%" }} 
-                value={name.toUpperCase()}
-                onChange={(e) => setName(e.target.value)}
-            />
-            {/*Username Validation*/}
-            <input 
-                type="text" 
-                placeholder="Username" 
-                style={{ padding: "8px", marginBottom: "10px", width: "100%" }} 
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+        <form onSubmit={handleRegister} style={{ display: "flex", flexDirection: "column" }}>
+          <input
+            type="text"
+            name="username"
+            placeholder="Username"
+            value={formData.username}
+            onChange={handleChange}
+            disabled={loading}
+            style={{
+              padding: "10px",
+              marginBottom: "12px",
+              border: "1px solid #cbd5e1",
+              borderRadius: "8px",
+              fontSize: "14px",
+            }}
+          />
 
-            />
-                {errors.username && (<p style={{color: "red",fontSize: "12px"}}>{errors.username}</p>)}
-            {/*Email Validation*/}
-            <input 
-                type="email" 
-                placeholder="Email" 
-                style={{ padding: "8px", marginBottom: "10px", width: "100%" }} 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}          
-            />
-                {errors.email && (<p style={{ color: "red",fontSize: "12px"}}>{errors.email}</p>)}    
-            
-            {/*Date of Birth Validation*/}
-            <input 
-                type="date" 
-                placeholder="Date of Birth" 
-                style={{ padding: "8px", marginBottom: "10px", width: "100%" }} 
-            />
-            {/*Password Validation*/}
-            <input 
-                type="password" 
-                placeholder="Password" 
-                style={{ padding: "8px", marginBottom: "10px", width: "100%" }} 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-            />
-                {errors.password && (<p style={{ color: "red",fontSize: "12px"}}>{errors.password}</p>)}
-            <p>
-                {
-                password.length < 8
-                ? "Weak"
-                : password.length < 12
-                ? "Medium"
-                : "Strong"
-                }
-            </p>
+          <input
+            type="date"
+            name="dob"
+            value={formData.dob}
+            onChange={handleChange}
+            disabled={loading}
+            style={{
+              padding: "10px",
+              marginBottom: "12px",
+              border: "1px solid #cbd5e1",
+              borderRadius: "8px",
+              fontSize: "14px",
+            }}
+          />
 
-            {/*Confirm Password Validation*/}
-            <input 
-                type="password" 
-                placeholder="Confirm Password" 
-                style={{ padding: "8px", marginBottom: "10px", width: "100%" }} 
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                error={errors.confirmPassword}
-            />
-                {errors.confirmPassword && (<p style={{ color: "red",fontSize: "12px"}}>{errors.confirmPassword}</p>)}
-            
-            {/*Submit Button*/}
-            <div style={{ display: "flex", alignItems: "center", marginBottom: "10px" }}>
-            <button 
-                style={{ padding: "10px 20px", backgroundColor: "#3b82f6", color: "#fff", border: "none", borderRadius: "4px" }}
-                onClick={handleRegister} disabled={!name || !username || !email || !password || !confirmPassword}
-            >
-                Create Account
-            </button>
-            <p style={{ marginLeft: "10px", color: "#94a3b8" }}>Already have an account? <Link to="/" style={{ color: "#3b82f6" }}>Login here</Link></p>
-            </div>
-        </div>
-    );
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={formData.email}
+            onChange={handleChange}
+            disabled={loading}
+            style={{
+              padding: "10px",
+              marginBottom: "12px",
+              border: "1px solid #cbd5e1",
+              borderRadius: "8px",
+              fontSize: "14px",
+            }}
+          />
 
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleChange}
+            disabled={loading}
+            style={{
+              padding: "10px",
+              marginBottom: "12px",
+              border: "1px solid #cbd5e1",
+              borderRadius: "8px",
+              fontSize: "14px",
+            }}
+          />
+
+          <input
+            type="password"
+            name="confirmPassword"
+            placeholder="Confirm Password"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            disabled={loading}
+            style={{
+              padding: "10px",
+              marginBottom: "16px",
+              border: "1px solid #cbd5e1",
+              borderRadius: "8px",
+              fontSize: "14px",
+            }}
+          />
+
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              padding: "10px 16px",
+              backgroundColor: loading ? "#93c5fd" : "#3b82f6",
+              color: "#ffffff",
+              border: "none",
+              borderRadius: "8px",
+              cursor: loading ? "not-allowed" : "pointer",
+              fontWeight: "600",
+            }}
+          >
+            {loading ? "Creating account..." : "Register"}
+          </button>
+        </form>
+
+        <p style={{ marginTop: "16px", color: "#475569" }}>
+          Already have an account?{" "}
+          <Link to="/" style={{ color: "#3b82f6", textDecoration: "none" }}>
+            Login here
+          </Link>
+        </p>
+      </div>
+    </div>
+  );
 }
 
 export default Register;

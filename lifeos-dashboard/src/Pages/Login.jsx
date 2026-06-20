@@ -1,67 +1,134 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-//import { getUser } from "../Utils/storage";
-import { auth } from "../firebase/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase/firebase";
 
 function Login() {
+  const navigate = useNavigate();
 
-const [email, setEmail] = useState("");
-const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
 
-const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
-const handleLogin = async () => {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
-  try {
-      console.log("Email:", email);
-      console.log("Password:", password);
-      console.log("EMAIL TYPE:", typeof email);
-      console.log("EMAIL VALUE:", JSON.stringify(email));
-      
-    await signInWithEmailAndPassword(
-      auth,
-      email.trim(),
-      password.trim()
-    );
+  const handleLogin = async (e) => {
+    e.preventDefault();
 
-    navigate("/dashboard");
+    const email = formData.email.trim();
+    const password = formData.password;
 
-  } catch (error) {
-  console.log("FULL ERROR:", error);
-  console.log("CODE:", error.code);
-  console.log("MESSAGE:", error.message);
+    if (!email || !password) {
+      alert("Please fill in all fields");
+      return;
+    }
 
-  alert(`${error.code} | ${error.message}`);
-}
+    setLoading(true);
 
-};
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Login error:", error);
+      alert(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div >
-        <h1>Login Page</h1>
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        background: "#f8fafc",
+      }}
+    >
+      <div
+        style={{
+          width: "100%",
+          maxWidth: "360px",
+          background: "#ffffff",
+          padding: "24px",
+          borderRadius: "12px",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+        }}
+      >
+        <h1 style={{ marginBottom: "8px", color: "#1e293b" }}>Login</h1>
+        <p style={{ marginBottom: "20px", color: "#64748b" }}>
+          Sign in to access your dashboard.
+        </p>
 
-        <p>This is where the login form will go.</p>
-  
-        <input 
-            type="email" 
-            placeholder="Email" 
-            style={{ padding: "8px", marginBottom: "10px", width: "50%", border: "1px solid #ccc",borderRadius: "4px" }} 
-            value={email}
-            onChange={(e) => setEmail(e.target.value.trim())}
-        />
-        <input 
-            type="password" 
-            placeholder="Password" 
-            style={{ padding: "8px", marginBottom: "10px", width: "50%", border: "1px solid #ccc",borderRadius: "4px" }} 
-            value={password}
-            onChange={(e) => setPassword(e.target.value.trim())}
-        />
-        <button onClick={handleLogin}
-        
-        style={{ padding: "8px 16px", backgroundColor: "#3b82f6", color: "#fff", border: "none", borderRadius: "4px" }} >Login</button>
-        <p style={{ marginTop: "10px" }}>Don't have an account? <Link to="/register" style={{ color: "#3b82f6" }}>Register here</Link></p>
+        <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column" }}>
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={formData.email}
+            onChange={handleChange}
+            disabled={loading}
+            style={{
+              padding: "10px",
+              marginBottom: "12px",
+              border: "1px solid #cbd5e1",
+              borderRadius: "8px",
+              fontSize: "14px",
+            }}
+          />
+
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleChange}
+            disabled={loading}
+            style={{
+              padding: "10px",
+              marginBottom: "16px",
+              border: "1px solid #cbd5e1",
+              borderRadius: "8px",
+              fontSize: "14px",
+            }}
+          />
+
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              padding: "10px 16px",
+              backgroundColor: loading ? "#93c5fd" : "#3b82f6",
+              color: "#ffffff",
+              border: "none",
+              borderRadius: "8px",
+              cursor: loading ? "not-allowed" : "pointer",
+              fontWeight: "600",
+            }}
+          >
+            {loading ? "Logging in..." : "Login"}
+          </button>
+        </form>
+
+        <p style={{ marginTop: "16px", color: "#475569" }}>
+          Don't have an account?{" "}
+          <Link to="/register" style={{ color: "#3b82f6", textDecoration: "none" }}>
+            Register here
+          </Link>
+        </p>
+      </div>
     </div>
   );
-}   
+}
+
 export default Login;
