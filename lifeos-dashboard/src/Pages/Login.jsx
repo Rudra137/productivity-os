@@ -28,11 +28,11 @@ const handleLogin = async () => {
     navigate("/dashboard");
 
   } catch (error) {
-  console.log(error);
-  console.log(error.code);
-  console.log(error.message);
+  console.log("FULL ERROR:", error);
+  console.log("CODE:", error.code);
+  console.log("MESSAGE:", error.message);
 
-  alert(error.code);
+  alert(`${error.code} | ${error.message}`);
 }
 
 };
