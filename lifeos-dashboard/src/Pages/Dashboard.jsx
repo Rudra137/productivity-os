@@ -69,8 +69,6 @@ function Dashboard() {
   }, [navigate]);
 
   // LOAD TASKS
-  // For now this still loads from localStorage.
-  // If you want, next step is moving tasks fully into Firestore.
   useEffect(() => {
     const savedTasks = localStorage.getItem("tasks");
     if (savedTasks) {
@@ -105,6 +103,7 @@ function Dashboard() {
     return tasks.filter((task) => task.date === today);
   }, [tasks, today]);
 
+  // FILTERED TASKS
   const filteredTasks = useMemo(() => {
     return todaysTasks.filter((task) => {
       if (filter === "Completed" && !task.completed) return false;
@@ -126,6 +125,7 @@ function Dashboard() {
     });
   }, [todaysTasks, filter, categoryFilter, searchTerm]);
 
+  // CHART DATA
   const chartData = useMemo(() => getWeeklyChartData(tasks), [tasks]);
   const radarData = useMemo(() => getLifeRadarData(tasks), [tasks]);
 
@@ -133,17 +133,20 @@ function Dashboard() {
   const total = todaysTasks.length;
   const completed = todaysTasks.filter((task) => task.completed).length;
   const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
-
+  // STATS FOR STATS SECTION
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter((task) => task.completed).length;
   const pendingTasks = totalTasks - completedTasks;
-
   const weeklyData = {
     Work: tasks.filter((task) => task.category === "Work" && task.completed).length,
     Health: tasks.filter((task) => task.category === "Health" && task.completed).length,
     Study: tasks.filter((task) => task.category === "Study" && task.completed).length,
+    General: tasks.filter((task) => task.category === "General" && task.completed).length,
+    Relationships: tasks.filter((task) => task.category === "Relationships" && task.completed).length,
+    Creativity: tasks.filter((task) => task.category === "Creativity" && task.completed).length,
+    Finance: tasks.filter((task) => task.category === "Finance" && task.completed).length,
   };
-
+  
   const totalMinutesAllocated = todaysTasks.reduce(
     (sum, task) => sum + (task.durationMinutes || 0),
     0

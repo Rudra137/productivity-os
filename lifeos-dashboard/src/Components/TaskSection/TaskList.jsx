@@ -37,7 +37,7 @@ const handleDragEnd = (result) => {
   const [movedItem] = items.splice(result.source.index, 1);
   items.splice(result.destination.index, 0, movedItem);
 
-  // Step 2: Update main tasks state (THIS is your code)
+  // Step 2: Update main tasks state
   setTasks((prev) => {
     const newTasks = [...prev];
 

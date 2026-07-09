@@ -53,8 +53,8 @@ export const getLifeRadarData = (tasks) => {
     Health: 0,
     Productivity: 0,
     Skills: 0,
-    Money: 0,
-    PersonalGrowth: 0,
+    Finance: 0,
+    Creativity: 0,
     Relationships: 0
   };
   const max = Math.max(...Object.values(domainScores), 1);
@@ -64,9 +64,7 @@ export const getLifeRadarData = (tasks) => {
     if (task.category === "Health") domainScores.Health += score;
     if (task.category === "Work") domainScores.Productivity += score;
     if (task.category === "Study") domainScores.Skills += score;
-
-    // future-ready mappings
-    if (task.category === "Finance") domainScores.Money += score;
+    if (task.category === "Relationships") domainScores.Relationships += score;
     if (task.category === "Spiritual") domainScores.PersonalGrowth += score;
     if (task.category === "Family") domainScores.Relationships += score;
   });

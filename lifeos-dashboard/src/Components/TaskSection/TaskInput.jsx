@@ -117,7 +117,10 @@ function TaskInput({ addTask }) {
             <option>Work</option>
             <option>Study</option>
             <option>Health</option>
-          </select>
+            <option>Relationships</option>
+            <option>Creativity</option>
+            <option>Finance</option>
+          </select>           
         </div>
 
         {/* DESCRIPTION */}
