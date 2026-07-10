@@ -3,7 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../firebase/firebase"; //
-
+import { addTaskToFirestore } from "../services/taskServices";
+import { getTasksFromFirestore } from "../services/taskServices";
+import { updateTaskInFirestore } from "../services/taskServices";
 import TaskFilters from "../Components/TaskSection/TaskFilters";
 import TaskInput from "../Components/TaskSection/TaskInput";
 import WeeklyChart from "../Components/WeeklyChart";
@@ -55,26 +57,47 @@ function Dashboard() {
   const today = new Date().toLocaleDateString();
 
   // AUTH EFFECT
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setCurrentUser(user);
-      } else {
-        navigate("/");
-      }
-      setAuthLoading(false);
-    });
+useEffect(() => {
+  const unsubscribe = onAuthStateChanged(auth, (user) => {
 
-    return () => unsubscribe();
-  }, [navigate]);
+    console.log("======== AUTH CALLBACK ========");
+    console.log(user);
 
-  // LOAD TASKS
-  useEffect(() => {
-    const savedTasks = localStorage.getItem("tasks");
-    if (savedTasks) {
-      setTasks(JSON.parse(savedTasks));
+    if (user) {
+      console.log("User found");
+      setCurrentUser(user);
+    } else {
+      console.log("No user");
+      navigate("/");
     }
-  }, []);
+
+    console.log("Setting authLoading false");
+
+    setAuthLoading(false);
+
+  });
+
+  return () => unsubscribe();
+}, [navigate]);
+
+  // LOAD TASKS FROM FIRESTORE
+// LOAD TASKS FROM FIRESTORE
+useEffect(() => {
+
+  if (!currentUser) return;
+
+  const loadTasks = async () => {
+
+    const firestoreTasks =
+      await getTasksFromFirestore(currentUser.uid);
+
+    setTasks(firestoreTasks);
+
+  };
+
+  loadTasks();
+
+}, [currentUser]);
 
   // SAVE TASKS
   useEffect(() => {
@@ -186,20 +209,30 @@ function Dashboard() {
   }, [total, percent, lastCheckedDate]);
 
   // ACTIONS
-  const addTask = (newTaskData) => {
-    const finalTask = {
-      id: Date.now().toString(),
-      title: newTaskData.taskName,
-      text: newTaskData.taskName,
-      category: newTaskData.category,
-      priority: newTaskData.priority,
-      description: newTaskData.description,
-      durationMinutes: Number(newTaskData.durationMinutes) || 0,
-      date: new Date().toLocaleDateString(),
-      completed: false,
-    };
+  const addTask = async (newTaskData) => {
+  const finalTask = {
+    title: newTaskData.taskName,
+    text: newTaskData.taskName,
+    category: newTaskData.category,
+    priority: newTaskData.priority,
+    description: newTaskData.description,
+    durationMinutes: Number(newTaskData.durationMinutes) || 0,
+    date: new Date().toLocaleDateString(),
+    completed: false,
+    uid: auth.currentUser.uid
+  };
+
+  try {
+    const firestoreId = await addTaskToFirestore(finalTask);
+
+    finalTask.id = firestoreId;
 
     setTasks((prev) => [...prev, finalTask]);
+
+  } catch (error) {
+  console.error(error);
+  alert(error.message);
+  }
   };
 
   const handleDelete = (id) => {
@@ -425,7 +458,9 @@ function Dashboard() {
             boxShadow: "0 4px 10px rgba(0,0,0,0.08)",
           }}
         >
-          <TaskInput addTask={addTask} />
+          <TaskInput 
+          addTask={addTask}
+          darkMode={darkMode} />
         </div>
       </div>
 

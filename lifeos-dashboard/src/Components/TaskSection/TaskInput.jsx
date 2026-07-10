@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-function TaskInput({ addTask }) {
+function TaskInput({ addTask, darkMode }) {
   const [taskData, setTaskData] = useState({
     taskName: "",
     category: "General",
@@ -9,11 +9,6 @@ function TaskInput({ addTask }) {
     timeValue: "", // The number input field
     timeUnit: "hours" // Default to hours
   });
-
-  const [darkMode, setDarkMode] = useState(() => {
-  const savedTheme = localStorage.getItem("darkMode");
-  return savedTheme ? JSON.parse(savedTheme) : false;
-});
 
 
   const handleChange = (e) => {
@@ -49,7 +44,7 @@ function TaskInput({ addTask }) {
 
   return (
     <div style={{
-      backgroundColor: darkMode ? "#334155" : "#ffffff",
+      backgroundColor: darkMode ? "#1e293b" : "#ffffff",
       borderRadius: "12px",
       boxShadow: "0 4px 20px rgba(0, 0, 0, 0.05)",
       width: "100%",
@@ -88,7 +83,7 @@ function TaskInput({ addTask }) {
               borderRadius: "6px",
               fontSize: "0.95rem",
               color: darkMode ? "#f8fafc" : "#334155",
-              backgroundColor: darkMode ? "#334155" : "#ffffff",  
+              backgroundColor: darkMode ? "#1e293b" : "#ffffff",  
               boxSizing: "border-box",
               outline: "none"
             }}
@@ -108,7 +103,7 @@ function TaskInput({ addTask }) {
               borderRadius: "6px",
               fontSize: "0.95rem",
               color: darkMode ? "#f8fafc" : "#334155",
-              backgroundColor: darkMode ? "#334155" : "#ffffff",
+              backgroundColor: darkMode ? "#1e293b" : "#ffffff",
               boxSizing: "border-box",
               outline: "none"
             }}
@@ -138,7 +133,7 @@ function TaskInput({ addTask }) {
               borderRadius: "6px",
               fontSize: "0.95rem",
               color: darkMode ? "#f8fafc" : "#334155",
-              backgroundColor: darkMode ? "#334155" : "#ffffff",  
+              backgroundColor: darkMode ? "#1e293b" : "#ffffff",  
               boxSizing: "border-box",
               outline: "none",
               resize: "vertical"
@@ -169,7 +164,7 @@ function TaskInput({ addTask }) {
               borderRadius: "6px",
               fontSize: "0.95rem",
               color: darkMode ? "#f8fafc" : "#334155",
-              backgroundColor: darkMode ? "#334155" : "#ffffff",
+              backgroundColor: darkMode ? "#1e293b" : "#ffffff",
               outline: "none"
             }}
           >
@@ -207,7 +202,7 @@ function TaskInput({ addTask }) {
                 borderRadius: "6px",
                 fontSize: "0.95rem",
                 color: darkMode ? "#f8fafc" : "#334155",
-                backgroundColor: darkMode ? "#334155" : "#ffffff",  
+                backgroundColor: darkMode ? "#1e293b" : "#ffffff",  
                 outline: "none",
                 textAlign: "center"
               }}
@@ -223,7 +218,7 @@ function TaskInput({ addTask }) {
                 borderRadius: "6px",
                 fontSize: "0.95rem",
                 color: darkMode ? "#f8fafc" : "#334155",
-                backgroundColor: darkMode ? "#334155" : "#ffffff",
+                backgroundColor: darkMode ? "#1e293b" : "#ffffff",
                 outline: "none"
               }}
             >
