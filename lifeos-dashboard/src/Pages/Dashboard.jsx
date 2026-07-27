@@ -6,6 +6,7 @@ import { auth } from "../firebase/firebase"; //
 import { addTaskToFirestore } from "../services/taskServices";
 import { getTasksFromFirestore } from "../services/taskServices";
 import { updateTaskInFirestore } from "../services/taskServices";
+import { deleteTaskFromFirestore } from "../services/taskServices";
 import TaskFilters from "../Components/TaskSection/TaskFilters";
 import TaskInput from "../Components/TaskSection/TaskInput";
 import WeeklyChart from "../Components/WeeklyChart";
@@ -245,17 +246,51 @@ console.log(firestoreTasks[0].description);
   }
   };
 
-  const handleDelete = (id) => {
-    setTasks((prev) => prev.filter((task) => task.id !== id));
-  };
 
-  const handleEdit = (id, newText) => {
+  // DELETE TASK
+const handleDelete = async (id) => {
+  try {
+
+    // Delete from Firestore
+    await deleteTaskFromFirestore(id);
+
+    // Remove from React state
+    setTasks((prev) => prev.filter((task) => task.id !== id));
+
+  } catch (error) {
+    console.error(error);
+    alert("Unable to delete task");
+  }
+};
+
+  // EDIT TASK
+const handleEdit = async (id, newText) => {
+  try {
+
+    // Update in Firestore
+    await updateTaskInFirestore(id, {
+      text: newText,
+      title: newText,
+    });
+
+    // Update local React state
     setTasks((prev) =>
       prev.map((task) =>
-        task.id === id ? { ...task, text: newText, title: newText } : task
+        task.id === id
+          ? {
+              ...task,
+              text: newText,
+              title: newText,
+            }
+          : task
       )
     );
-  };
+
+  } catch (error) {
+    console.error(error);
+    alert("Unable to update task");
+  }
+};
 
   const toggleComplete = (id) => {
     setTasks((prev) =>

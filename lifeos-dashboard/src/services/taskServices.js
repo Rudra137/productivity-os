@@ -63,3 +63,15 @@ export const updateTaskInFirestore = async (taskId, updatedTask) => {
       throw error;
   }
 };
+
+// Delete a task from Firestore
+export const deleteTaskFromFirestore = async (taskId) => {
+  try {
+    const taskRef = doc(db, "tasks", taskId);
+    await deleteDoc(taskRef);
+    console.log("Task deleted successfully");
+  } catch (error) {
+    console.error("Firestore Error:", error);
+    throw error;
+  }
+};
