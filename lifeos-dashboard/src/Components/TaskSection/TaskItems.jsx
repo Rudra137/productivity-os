@@ -98,6 +98,8 @@ const currentPriorityStyle =
   priorityStyles[task.priority] ||
   priorityStyles.General;
 
+  console.log(task);
+
   return (
 <li
   ref={provided.innerRef}

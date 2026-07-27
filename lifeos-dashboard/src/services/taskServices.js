@@ -26,24 +26,30 @@ export const addTaskToFirestore = async (task) => {
   }
 };
 
+
 // Retrieve tasks from Firestore
 export const getTasksFromFirestore = async (uid) => {
+  try {
 
     const q = query(
-        collection(db,"tasks"),
-        where("uid","==",uid)
+      collection(db, "tasks"),
+      where("uid", "==", uid)
     );
 
     const snapshot = await getDocs(q);
 
-    const tasks = snapshot.docs.map((doc)=>({
-        id: doc.id,
-        ...doc.data()
+    const tasks = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data()
     }));
 
     return tasks;
-}
 
+  } catch (error) {
+    console.error("Firestore Error:", error);
+    throw error;
+  }
+};
 // Update a task in Firestore
 export const updateTaskInFirestore = async (taskId, updatedTask) => {
 

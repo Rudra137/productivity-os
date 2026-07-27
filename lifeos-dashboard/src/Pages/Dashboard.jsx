@@ -80,18 +80,29 @@ useEffect(() => {
   return () => unsubscribe();
 }, [navigate]);
 
-  // LOAD TASKS FROM FIRESTORE
 // LOAD TASKS FROM FIRESTORE
 useEffect(() => {
 
-  if (!currentUser) return;
+  if (!currentUser) {
+    console.log("No current user yet");
+    return;
+  }
+
+  console.log("Current UID:", currentUser.uid);
 
   const loadTasks = async () => {
 
     const firestoreTasks =
       await getTasksFromFirestore(currentUser.uid);
 
+    console.log("Firestore Tasks:", firestoreTasks);
+    console.log("First Task:", JSON.stringify(firestoreTasks[0], null, 2));
+
     setTasks(firestoreTasks);
+
+    console.log(firestoreTasks[0].text);
+console.log(firestoreTasks[0].title);
+console.log(firestoreTasks[0].description);
 
   };
 
@@ -122,9 +133,7 @@ useEffect(() => {
   }, [lastCheckedDate]);
 
   // DERIVED TASK DATA
-  const todaysTasks = useMemo(() => {
-    return tasks.filter((task) => task.date === today);
-  }, [tasks, today]);
+  const todaysTasks = tasks;
 
   // FILTERED TASKS
   const filteredTasks = useMemo(() => {
@@ -156,6 +165,7 @@ useEffect(() => {
   const total = todaysTasks.length;
   const completed = todaysTasks.filter((task) => task.completed).length;
   const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
+
   // STATS FOR STATS SECTION
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter((task) => task.completed).length;
