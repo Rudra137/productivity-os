@@ -6,7 +6,8 @@ import {
   deleteDoc,
   doc,
   where,
-  query
+  query,
+  onSnapshot
 } from "firebase/firestore";
 
 import { db } from "../firebase/firebase";
@@ -26,6 +27,21 @@ export const addTaskToFirestore = async (task) => {
   }
 };
 
+// Subscribe to real-time updates of tasks from Firestore
+export const subscribeToTasks = (uid, callback) => {
+  const q = query(
+    collection(db, "tasks"),
+    where("uid", "==", uid)
+  );
+
+  return onSnapshot(q, (snapshot) => {
+    const tasks = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+    callback(tasks);
+  });
+};
 
 // Retrieve tasks from Firestore
 export const getTasksFromFirestore = async (uid) => {

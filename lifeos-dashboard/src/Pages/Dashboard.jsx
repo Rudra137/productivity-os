@@ -7,6 +7,7 @@ import { addTaskToFirestore } from "../services/taskServices";
 import { getTasksFromFirestore } from "../services/taskServices";
 import { updateTaskInFirestore } from "../services/taskServices";
 import { deleteTaskFromFirestore } from "../services/taskServices";
+import { subscribeToTasks } from "../services/taskServices";
 import TaskFilters from "../Components/TaskSection/TaskFilters";
 import TaskInput from "../Components/TaskSection/TaskInput";
 import WeeklyChart from "../Components/WeeklyChart";
@@ -82,32 +83,18 @@ useEffect(() => {
 }, [navigate]);
 
 // LOAD TASKS FROM FIRESTORE
-useEffect(() => {
+  useEffect(() => {
 
-  if (!currentUser) {
-    console.log("No current user yet");
-    return;
-  }
+  if (!currentUser) return;
 
-  console.log("Current UID:", currentUser.uid);
+  const unsubscribe = subscribeToTasks(
+    currentUser.uid,
+    (tasks) => {
+      setTasks(tasks);
+    }
+  );
 
-  const loadTasks = async () => {
-
-    const firestoreTasks =
-      await getTasksFromFirestore(currentUser.uid);
-
-    console.log("Firestore Tasks:", firestoreTasks);
-    console.log("First Task:", JSON.stringify(firestoreTasks[0], null, 2));
-
-    setTasks(firestoreTasks);
-
-    console.log(firestoreTasks[0].text);
-console.log(firestoreTasks[0].title);
-console.log(firestoreTasks[0].description);
-
-  };
-
-  loadTasks();
+  return () => unsubscribe();
 
 }, [currentUser]);
 
