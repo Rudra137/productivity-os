@@ -207,7 +207,7 @@ useEffect(() => {
   }, [total, percent, lastCheckedDate]);
 
   // ACTIONS
-  const addTask = async (newTaskData) => {
+const addTask = async (newTaskData) => {
   const finalTask = {
     title: newTaskData.taskName,
     text: newTaskData.taskName,
@@ -217,21 +217,17 @@ useEffect(() => {
     durationMinutes: Number(newTaskData.durationMinutes) || 0,
     date: new Date().toLocaleDateString(),
     completed: false,
-    uid: auth.currentUser.uid
+    uid: auth.currentUser.uid,
   };
 
   try {
-    const firestoreId = await addTaskToFirestore(finalTask);
-
-    finalTask.id = firestoreId;
-
-    setTasks((prev) => [...prev, finalTask]);
+    await addTaskToFirestore(finalTask);
 
   } catch (error) {
-  console.error(error);
-  alert(error.message);
+    console.error(error);
+    alert(error.message);
   }
-  };
+};
 
 
   // DELETE TASK
