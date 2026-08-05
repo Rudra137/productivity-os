@@ -6,13 +6,14 @@ function StatsSection({
   completedTasks,
   pendingTasks,
   streak,
+
   darkMode
 }) {
   return (
     <div
-      style={{
+      style={{ height: "400px", width: "100%",
         display: "grid",
-        gridTemplateRows: "repeat(4, 1fr)",
+        gridTemplateRows: "repeat(7, 1fr)",
 
         gap: "5px",
         marginBottom: "10px"
@@ -39,6 +40,12 @@ function StatsSection({
       <StatsCard
         title="Streak"
         value={`${streak} Days`}
+        darkMode={darkMode}
+      /> 
+
+      <StatsCard
+        title="Today's Score"
+        value={Math.round((completedTasks / totalTasks) * 100)}
         darkMode={darkMode}
       />
     </div>

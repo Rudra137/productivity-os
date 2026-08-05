@@ -275,14 +275,24 @@ const handleEdit = async (id, newText) => {
   }
 };
 
-  const toggleComplete = (id) => {
-    setTasks((prev) =>
-      prev.map((task) =>
-        task.id === id ? { ...task, completed: !task.completed } : task
-      )
-    );
-  };
+// TOGGLE COMPLETE
+const toggleComplete = async (id) => {
+  try {
+    const task = tasks.find((task) => task.id === id);
 
+    if (!task) return;
+
+    await updateTaskInFirestore(id, {
+      completed: !task.completed,
+    });
+
+  } catch (error) {
+    console.error(error);
+    alert(error.message);
+  }
+};
+
+// DRAG AND DROP
   const handleDragEnd = (result) => {
     if (!result.destination) return;
 
@@ -464,19 +474,17 @@ const handleEdit = async (id, newText) => {
           </DragDropContext>
         </div>
 
-        <div>
-          <StatsSection
-            total={totalTasks}
-            completed={completedTasks}
-            pending={pendingTasks}
-            streak={streak}
-            darkMode={darkMode}
-            totalTimeAllocated={formatTime(totalMinutesAllocated)}
-            totalTimeSpent={formatTime(totalMinutesCompleted)}
-            todayScore={todayScore}
-            maxValue={maxValue}
-          />
-        </div>
+<StatsSection
+    totalTasks={totalTasks}
+    completedTasks={completedTasks}
+    pendingTasks={pendingTasks}
+    streak={streak}
+    darkMode={darkMode}
+    totalTimeAllocated={formatTime(totalMinutesAllocated)}
+    totalTimeSpent={formatTime(totalMinutesCompleted)}
+    todayScore={todayScore}
+    maxValue={maxValue}
+/>
 
         <div
           style={{
