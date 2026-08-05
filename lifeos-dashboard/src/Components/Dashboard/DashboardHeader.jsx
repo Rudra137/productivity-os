@@ -2,6 +2,7 @@ import WeatherWidget from "./WeatherWidget";
 import { useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { auth } from "../../firebase/firebase";
+import DailyQuotes from "./DailyQuotes";
 
 function DashboardHeader({ darkMode, userName, currentDate }) {
   const navigate = useNavigate();
@@ -14,9 +15,8 @@ function DashboardHeader({ darkMode, userName, currentDate }) {
             <h1 className="greeting" style={{ fontSize: "32px", margin: 0, color: darkMode ? "#f8fafc" : "#0f172a" }}>
                 Welcome back, {userName}!
             </h1>
-            <h4 className="DailyQuote" style={{ fontSize: "16px", color: darkMode ? "#cbd5e1" : "#475569" }}>
-                When life gives you lemons, make lemonade.
-            </h4>
+            <DailyQuotes darkMode={darkMode} />
+            
         </div>
         {/* Right side: Weather and date/time */}
         <div className="header-right" style={{ marginBottom: "20px", textAlign: "right", padding: "10px" }}>
