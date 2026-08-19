@@ -16,6 +16,7 @@ import TaskItem from "../Components/TaskSection/TaskItems";
 import StatsSection from "../Components/Dashboard/StatsSection";
 import DashboardHeader from "../Components/Dashboard/DashboardHeader";
 import DashboardFooter from "../Components/Dashboard/DashboardFooter";
+import { serverTimestamp } from "firebase/firestore";
 
 import {
   getWeeklyChartData,
@@ -81,15 +82,16 @@ useEffect(() => {
 
   return () => unsubscribe();
 }, [navigate]);
-
-// LOAD TASKS FROM FIRESTORE
-  useEffect(() => {
+  
+  // LOAD TASKS FROM FIRESTORE
+useEffect(() => {
 
   if (!currentUser) return;
 
   const unsubscribe = subscribeToTasks(
     currentUser.uid,
     (tasks) => {
+      console.log("TASKS RECEIVED BY DASHBOARD:", tasks);
       setTasks(tasks);
     }
   );
@@ -123,27 +125,104 @@ useEffect(() => {
   // DERIVED TASK DATA
   const todaysTasks = tasks;
 
-  // FILTERED TASKS
-  const filteredTasks = useMemo(() => {
-    return todaysTasks.filter((task) => {
-      if (filter === "Completed" && !task.completed) return false;
-      if (filter === "Pending" && task.completed) return false;
-      if (categoryFilter !== "All" && task.category !== categoryFilter) return false;
+  // PARSE DATE FUNCTION
+  const parseDate = (dateString) => {
+  if (!dateString) return new Date(0);
 
-      if (
-        searchTerm &&
-        !(
-          task.text?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          task.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          task.category?.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-      ) {
+  const [day, month, year] = dateString.split("/");
+
+  return new Date(
+    Number(year),
+    Number(month) - 1,
+    Number(day)
+  );
+};
+
+  // FILTERED TASKS
+const filteredTasks = useMemo(() => {
+  const priorityOrder = {
+    High: 3,
+    Medium: 2,
+    Low: 1,
+    General: 0
+  };
+
+  const result = tasks.filter((task) => {
+
+    // Status filter
+    if (filter === "Completed" && !task.completed) {
+      return false;
+    }
+
+    if (filter === "Pending" && task.completed) {
+      return false;
+    }
+
+    // Category filter
+    if (
+      categoryFilter !== "All" &&
+      task.category !== categoryFilter
+    ) {
+      return false;
+    }
+
+    // Search filter
+    if (searchTerm) {
+      const search = searchTerm.toLowerCase();
+
+      const matches =
+        task.text?.toLowerCase().includes(search) ||
+        task.description?.toLowerCase().includes(search) ||
+        task.category?.toLowerCase().includes(search);
+
+      if (!matches) {
         return false;
       }
+    }
 
-      return true;
-    });
-  }, [todaysTasks, filter, categoryFilter, searchTerm]);
+    return true;
+  });
+
+  // SORT
+  result.sort((a, b) => {
+
+    // 1. Newest date first
+    const dateA = parseDate(a.date);
+    const dateB = parseDate(b.date);
+
+    if (dateA.getTime() !== dateB.getTime()) {
+      return dateB.getTime() - dateA.getTime();
+    }
+
+    // 2. Higher priority first
+    const priorityA =
+      priorityOrder[a.priority] ?? 0;
+
+    const priorityB =
+      priorityOrder[b.priority] ?? 0;
+
+    if (priorityA !== priorityB) {
+      return priorityB - priorityA;
+    }
+
+    // 3. Newest createdAt first
+    const timeA =
+      a.createdAt?.toMillis?.() ?? 0;
+
+    const timeB =
+      b.createdAt?.toMillis?.() ?? 0;
+
+    return timeB - timeA;
+  });
+
+  return result;
+
+}, [
+  tasks,
+  filter,
+  categoryFilter,
+  searchTerm
+]);
 
   // CHART DATA
   const chartData = useMemo(() => getWeeklyChartData(tasks), [tasks]);
@@ -218,6 +297,9 @@ const addTask = async (newTaskData) => {
     date: new Date().toLocaleDateString(),
     completed: false,
     uid: auth.currentUser.uid,
+
+    // Firestore creation timestamp
+    createdAt: serverTimestamp()
   };
 
   try {
@@ -445,6 +527,20 @@ const toggleComplete = async (id) => {
                   ref={provided.innerRef}
                   style={{ listStyle: "none", padding: 0 }}
                 >
+              <div
+              style={{
+                maxHeight: "380px",
+                overflowY: "auto",
+                paddingRight: "6px"
+              }}
+            >
+              <ul
+                style={{
+                  margin: 0,
+                  padding: 0,
+                  listStyle: "none"
+                }}
+              >
                   {filteredTasks.map((task, index) => (
                     <Draggable
                       key={task.id}
@@ -467,6 +563,9 @@ const toggleComplete = async (id) => {
                       )}
                     </Draggable>
                   ))}
+                  </ul>
+                  </div>
+
                   {provided.placeholder}
                 </ul>
               )}

@@ -5,35 +5,52 @@ export const getTaskScore = (task) => {
 };
 
 export const getWeeklyChartData = (tasks) => {
-  // your logic here
-  
   const now = new Date();
 
-  return [...Array(7)].map((_, i) => {
+  const rawData = [...Array(7)].map((_, i) => {
     const d = new Date();
     d.setDate(now.getDate() - i);
 
     const dateStr = d.toLocaleDateString();
-    const dayName = d.toLocaleDateString("en-US", { weekday: "short" });
+    const dayName = d.toLocaleDateString("en-US", {
+      weekday: "short"
+    });
 
-    const dayTasks = tasks.filter(t => t.date === dateStr && t.completed);
+    const dayTasks = tasks.filter(
+      (t) => t.date === dateStr && t.completed
+    );
 
     return {
       day: dayName,
 
       Work: dayTasks
-        .filter(t => t.category === "Work")
+        .filter((t) => t.category === "Work")
         .reduce((sum, t) => sum + getTaskScore(t), 0),
 
       Health: dayTasks
-        .filter(t => t.category === "Health")
+        .filter((t) => t.category === "Health")
         .reduce((sum, t) => sum + getTaskScore(t), 0),
 
       Study: dayTasks
-        .filter(t => t.category === "Study")
+        .filter((t) => t.category === "Study")
         .reduce((sum, t) => sum + getTaskScore(t), 0),
     };
   }).reverse();
+
+  // Find the highest score achieved in each domain
+  const maxWork = Math.max(...rawData.map((d) => d.Work), 1);
+  const maxHealth = Math.max(...rawData.map((d) => d.Health), 1);
+  const maxStudy = Math.max(...rawData.map((d) => d.Study), 1);
+
+  return rawData.map((day) => ({
+    day: day.day,
+
+    Work: Math.round((day.Work / maxWork) * 100),
+
+    Health: Math.round((day.Health / maxHealth) * 100),
+
+    Study: Math.round((day.Study / maxStudy) * 100),
+  }));
 };
 
 export const getLifeRadarData = (tasks) => {

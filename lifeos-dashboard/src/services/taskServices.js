@@ -12,10 +12,14 @@ import {
 
 import { db } from "../firebase/firebase";
 
-//Add a task to Firestore
+
+// ADD TASK
 export const addTaskToFirestore = async (task) => {
   try {
-    const docRef = await addDoc(collection(db, "tasks"), task);
+    const docRef = await addDoc(
+      collection(db, "tasks"),
+      task
+    );
 
     console.log("Task added with ID:", docRef.id);
 
@@ -23,11 +27,30 @@ export const addTaskToFirestore = async (task) => {
 
   } catch (error) {
     console.error("Firestore Error:", error);
-      throw error;
+    throw error;
   }
 };
 
-// Subscribe to real-time updates of tasks from Firestore
+
+// GET TASKS
+export const getTasksFromFirestore = async (uid) => {
+  const q = query(
+    collection(db, "tasks"),
+    where("uid", "==", uid)
+  );
+
+  const snapshot = await getDocs(q);
+
+  const tasks = snapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data()
+  }));
+
+  return tasks;
+};
+
+
+// REALTIME TASK LISTENER
 export const subscribeToTasks = (uid, callback) => {
   const q = query(
     collection(db, "tasks"),
@@ -39,53 +62,53 @@ export const subscribeToTasks = (uid, callback) => {
       id: doc.id,
       ...doc.data()
     }));
+
+    console.log("REALTIME TASKS:", tasks);
+
     callback(tasks);
   });
 };
 
-// Retrieve tasks from Firestore
-export const getTasksFromFirestore = async (uid) => {
-  try {
 
-    const q = query(
-      collection(db, "tasks"),
-      where("uid", "==", uid)
+// UPDATE TASK
+export const updateTaskInFirestore = async (
+  taskId,
+  updatedTask
+) => {
+  try {
+    const taskRef = doc(
+      db,
+      "tasks",
+      taskId
     );
 
-    const snapshot = await getDocs(q);
+    await updateDoc(
+      taskRef,
+      updatedTask
+    );
 
-    const tasks = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data()
-    }));
-
-    return tasks;
+    console.log("Task updated successfully");
 
   } catch (error) {
     console.error("Firestore Error:", error);
     throw error;
   }
 };
-// Update a task in Firestore
-export const updateTaskInFirestore = async (taskId, updatedTask) => {
 
-  try { 
-      const taskRef = doc(db, "tasks", taskId);
-      await updateDoc(taskRef, updatedTask);
-      console.log("Task updated successfully");
-      } 
-      catch (error) {
-      console.error("Firestore Error:", error);
-      throw error;
-  }
-};
 
-// Delete a task from Firestore
+// DELETE TASK
 export const deleteTaskFromFirestore = async (taskId) => {
   try {
-    const taskRef = doc(db, "tasks", taskId);
+    const taskRef = doc(
+      db,
+      "tasks",
+      taskId
+    );
+
     await deleteDoc(taskRef);
+
     console.log("Task deleted successfully");
+
   } catch (error) {
     console.error("Firestore Error:", error);
     throw error;
